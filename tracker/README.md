@@ -35,7 +35,7 @@ the UBC Hackathon 2026.
 Run these from any folder. Data is always saved to
 `tracker/data/` and reports to `tracker/reports/`.
 
-Start data collection (repeats every 60 seconds):
+Start data collection (repeats every 5 minutes; after the first full pull it only asks for new rows):
 
     python tracker/tracker.py
 

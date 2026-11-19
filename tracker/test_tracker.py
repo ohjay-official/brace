@@ -45,6 +45,29 @@ class DataPathTest(unittest.TestCase):
             self.assertFalse((elsewhere / "data").exists())
 
 
+class IncrementalFetchTest(unittest.TestCase):
+    """The relayer's history store has a free daily read limit: after the first pull, only ask for new rows."""
+
+    def test_first_pull_is_full_then_only_new_rows(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            calls = []
+
+            def fetch(asset, since=None):
+                calls.append((asset, since))
+                return [{"ts": 1000, "spot": 1.0}, {"ts": 2000, "spot": 2.0}]
+
+            with mock.patch.object(tracker, "DATA_DIR", Path(tmp)), \
+                 mock.patch.object(tracker, "fetch_history", fetch):
+                tracker.run_once()
+                tracker.run_once()
+            first = [c for c in calls if c[0] == "SOL"]
+            self.assertEqual(first[0], ("SOL", None))
+            self.assertEqual(first[1], ("SOL", 2000 - tracker.OVERLAP_SECS))
+
+    def test_polls_no_faster_than_every_five_minutes(self):
+        self.assertGreaterEqual(tracker.INTERVAL, 300)
+
+
 class OnceFlagTest(unittest.TestCase):
     def run_main(self, argv, fetch):
         with tempfile.TemporaryDirectory() as tmp:

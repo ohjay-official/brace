@@ -7,14 +7,20 @@ from datetime import datetime, timezone
 
 BASE_URL = "https://brace-relayer.ohjaye0.workers.dev"
 ASSETS = ["SOL", "BTC", "ETH", "XRP", "ZEC"]
-INTERVAL = 60
+# Every 5 minutes, and only new rows after the first pull: the relayer's history store
+# (Cloudflare D1, free plan) has a daily read limit that full pulls every minute used up.
+INTERVAL = 300
+# Re-read the last 10 minutes each time, so rows that reached the relayer late are not missed.
+OVERLAP_SECS = 600
 
 # Same folder analytics.py reads, whatever folder you run from.
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
-def fetch_history(asset):
+def fetch_history(asset, since=None):
     url = f"{BASE_URL}/history?asset={asset}"
+    if since is not None:
+        url += f"&since={int(since)}"
 
     headers = {
         "User-Agent": "BraceTracker/1.0",
@@ -51,6 +57,18 @@ def save_history(asset, records):
     return len(history)
 
 
+def last_saved_ts(asset):
+    """Newest ts already saved for this asset, or None before the first pull."""
+    path = DATA_DIR / f"{asset}.json"
+    if not path.exists():
+        return None
+    try:
+        rows = json.loads(path.read_text())
+        return max(int(r["ts"]) for r in rows) if rows else None
+    except (ValueError, KeyError, TypeError):
+        return None
+
+
 def run_once():
     """One pass over every asset. Returns the number of assets that failed."""
     print("\n", datetime.now(timezone.utc).isoformat())
@@ -59,7 +77,8 @@ def run_once():
 
     for asset in ASSETS:
         try:
-            records = fetch_history(asset)
+            last = last_saved_ts(asset)
+            records = fetch_history(asset) if last is None else fetch_history(asset, last - OVERLAP_SECS)
             total = save_history(asset, records)
 
             print(f"[OK] {asset}: {total} records saved")
