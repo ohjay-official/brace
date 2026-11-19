@@ -32,17 +32,29 @@ the UBC Hackathon 2026.
 
 ## Usage
 
-Start data collection:
+Run these from any folder. Data is always saved to
+`tracker/data/` and reports to `tracker/reports/`.
 
-    python tracker.py
+Start data collection (repeats every 60 seconds):
+
+    python tracker/tracker.py
+
+Collect once and exit (for cron or a quick refresh;
+exit code 1 if any asset failed):
+
+    python tracker/tracker.py --once
 
 Run statistical analysis:
 
-    python analytics.py
+    python tracker/analytics.py
 
 Generate a validation report:
 
-    python report.py
+    python tracker/report.py
+
+Run the tests (no network needed):
+
+    python tracker/test_tracker.py
 
 ## Methodology
 
