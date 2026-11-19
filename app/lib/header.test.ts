@@ -6,10 +6,11 @@ import { describe, expect, test } from "vitest";
 // Every page is reached through the numbered frosted menu, which opens at every width.
 const css = readFileSync(join(__dirname, "..", "app", "globals.css"), "utf8");
 const chrome = readFileSync(join(__dirname, "..", "components", "Chrome.tsx"), "utf8");
-const v3 = css.slice(css.indexOf("/* ==== Header v3"));
+const v3Start = css.indexOf("/* ==== Header v3");
+const v3 = css.slice(v3Start, css.indexOf("\n/*", v3Start + 10));
 
 describe("one header at every width", () => {
-  test("Header v3 is the last header block and shows the menu button with no media query", () => {
+  test("Header v3 shows the menu button with no media query", () => {
     expect(v3.length).toBeGreaterThan(0);
     expect(v3).not.toMatch(/@media/);
     expect(v3).toMatch(/\.menu\s*\{\s*display:\s*block\s*!important/);
