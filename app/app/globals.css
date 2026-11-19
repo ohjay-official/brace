@@ -6456,3 +6456,17 @@ body:has(.privacy) {
     opacity: 0.35;
   }
 }
+
+/* The dial bleeds right; clip it at the page edge so nothing scrolls sideways. Lighter on phones. */
+.borrow-page {
+  overflow-x: clip;
+}
+.linehead::before {
+  filter: none;
+  will-change: transform;
+}
+@media (max-width: 899px) {
+  .linehead::before {
+    animation: none;
+  }
+}
