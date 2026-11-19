@@ -73,14 +73,14 @@ export default function Home() {
           <header className="shead">
             <p className="shead-k">Three rules in the program</p>
             <h2 id="rules-title" className="converge">
-              <span className="cv-a">It only ever</span> <span className="cv-b">tightens on its own</span>
+              <span className="cv-a">Bad data can</span> <span className="cv-b">only lower it</span>
             </h2>
           </header>
           <ol className="rules">
             <li>
               <span className="r-n">R1</span>
               <h3>The fit happens onchain</h3>
-              <p>The relayer posts raw quotes, never a volatility number. The program does the fit, so nobody can hand it a convenient answer.</p>
+              <p>The relayer posts raw quotes, never a volatility number. The program does the fit itself and keeps every limit between 30% and 75%.</p>
             </li>
             <li className="r-wide">
               <span className="r-n">R2</span>

@@ -7178,3 +7178,6 @@ body:has(.sheet.is-open) footer {
     background-clip: text;
   }
 }
+
+/* ladder legend: keep each key with its label when the line wraps */
+.rungs-foot .key-item { white-space: nowrap; }

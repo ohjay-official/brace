@@ -82,7 +82,7 @@ export function LadderRungs({ symbol, max = 12 }: { symbol: Symbol; max?: number
       <p className="rungs-foot">
         {source === "quotes" ? (
           <>
-            <span className="key key-m" aria-hidden /> mid chance <span className="key key-q" aria-hidden /> Gemini bid to ask <span className="key key-f" aria-hidden /> onchain fit
+            <span className="key-item"><span className="key key-m" aria-hidden /> mid chance</span> <span className="key-item"><span className="key key-q" aria-hidden /> Gemini bid to ask</span> <span className="key-item"><span className="key key-f" aria-hidden /> onchain fit</span>
           </>
         ) : source === "fit" ? (
           "Gemini quotes are not loading right now, so every rung shows the onchain fit only."
