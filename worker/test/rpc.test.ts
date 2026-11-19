@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
   isRetryableRpcError,
   parseRpcUrls,
+  relayerRpcUrls,
   retryAfterMs,
   retryWithBackoff,
   rpcAwareFetch,
@@ -121,5 +122,68 @@ describe("rotateUrls", () => {
     expect(rotateUrls(urls, -1)).toEqual([urls[1], urls[0]]);
     expect(rotateUrls(["https://only.example"], 9)).toEqual(["https://only.example"]);
     expect(rotateUrls([], 3)).toEqual([]);
+  });
+});
+
+describe("RPC_URL_BACKUP (keyed fallback, kept last and out of rotation)", () => {
+  const PUB = "https://solana-devnet.api.onfinality.io/public,https://solana-devnet.gateway.tatum.io";
+  const BACKUP = "https://example.solana-devnet.quiknode.pro/SECRETKEY123/";
+
+  test("is appended after the public URLs", () => {
+    expect(parseRpcUrls({ RPC_URLS: PUB, RPC_URL_BACKUP: BACKUP })).toEqual([
+      "https://solana-devnet.api.onfinality.io/public",
+      "https://solana-devnet.gateway.tatum.io",
+      BACKUP,
+    ]);
+  });
+
+  test("is ignored when blank, not https, or already in the list", () => {
+    expect(parseRpcUrls({ RPC_URLS: PUB, RPC_URL_BACKUP: "  " })).toHaveLength(2);
+    expect(parseRpcUrls({ RPC_URLS: PUB, RPC_URL_BACKUP: "http://insecure.example" })).toHaveLength(2);
+    expect(parseRpcUrls({ RPC_URLS: PUB, RPC_URL_BACKUP: "https://solana-devnet.gateway.tatum.io" })).toHaveLength(2);
+  });
+
+  test("without public URLs it still follows the default devnet URL", () => {
+    expect(parseRpcUrls({ RPC_URL_BACKUP: BACKUP })).toEqual(["https://solana-devnet.api.onfinality.io/public", BACKUP]);
+  });
+
+  test("relayerRpcUrls rotates only the public URLs and keeps the backup last", () => {
+    const env = { RPC_URLS: PUB, RPC_URL_BACKUP: BACKUP };
+    for (const offset of [0, 1, 2, 3, 7]) {
+      const urls = relayerRpcUrls(env, offset);
+      expect(urls).toHaveLength(3);
+      expect(urls[2]).toBe(BACKUP);
+    }
+    expect(relayerRpcUrls(env, 1)[0]).toBe("https://solana-devnet.gateway.tatum.io");
+    expect(relayerRpcUrls({ RPC_URLS: PUB }, 1)).toEqual(rotateUrls(parseRpcUrls({ RPC_URLS: PUB }), 1));
+  });
+
+  test("withRpcFallback reaches the backup when every public URL fails", async () => {
+    const urls = parseRpcUrls({ RPC_URLS: PUB, RPC_URL_BACKUP: BACKUP });
+    const { result, url } = await withRpcFallback(
+      urls,
+      async (u) => {
+        if (u !== BACKUP) throw new Error("rpc http 503");
+        return "ok";
+      },
+      { retries: 0, sleep: async () => {} },
+    );
+    expect(result).toBe("ok");
+    expect(url).toBe(BACKUP);
+  });
+
+  test("a final error never carries an RPC URL (health output is public)", async () => {
+    const urls = parseRpcUrls({ RPC_URLS: PUB, RPC_URL_BACKUP: BACKUP });
+    const err = await withRpcFallback(
+      urls,
+      async (u) => {
+        throw new Error(`request to ${u} failed, reason: boom`);
+      },
+      { retries: 0, sleep: async () => {} },
+    ).catch((e: Error) => e);
+    expect(err).toBeInstanceOf(Error);
+    expect(String((err as Error).message)).not.toContain("SECRETKEY123");
+    expect(String((err as Error).message)).not.toContain("quiknode");
+    expect(String((err as Error).message)).toContain("[rpc]");
   });
 });

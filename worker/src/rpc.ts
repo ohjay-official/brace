@@ -1,10 +1,14 @@
 /** RPC URL lists, 429 backoff, and endpoint fallback for the relayer. */
 
-export type RpcEnv = { RPC_URLS?: string; RPC_URL?: string };
+/**
+ * RPC_URL_BACKUP is an optional Worker secret (a keyed endpoint, e.g. QuickNode,
+ * whose URL contains the key). It is always tried last and never rotated in.
+ */
+export type RpcEnv = { RPC_URLS?: string; RPC_URL?: string; RPC_URL_BACKUP?: string };
 
 const DEFAULT_DEVNET = "https://solana-devnet.api.onfinality.io/public";
 
-export function parseRpcUrls(env: RpcEnv): string[] {
+function publicRpcUrls(env: RpcEnv): string[] {
   const raw = (env.RPC_URLS && env.RPC_URLS.trim()) || env.RPC_URL || "";
   const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
   const seen = new Set<string>();
@@ -16,6 +20,50 @@ export function parseRpcUrls(env: RpcEnv): string[] {
     }
   }
   return out.length ? out : [DEFAULT_DEVNET];
+}
+
+function backupRpcUrl(env: RpcEnv, publicUrls: string[]): string | null {
+  const url = (env.RPC_URL_BACKUP ?? "").trim();
+  if (!url.startsWith("https://") || publicUrls.includes(url)) return null;
+  return url;
+}
+
+/** Public URLs in order, then the keyed backup (if set). */
+export function parseRpcUrls(env: RpcEnv): string[] {
+  const pub = publicRpcUrls(env);
+  const backup = backupRpcUrl(env, pub);
+  return backup ? [...pub, backup] : pub;
+}
+
+/** Relayer order for one run: public URLs rotated by `offset` to spread load, backup always last. */
+export function relayerRpcUrls(env: RpcEnv, offset: number): string[] {
+  const pub = publicRpcUrls(env);
+  const backup = backupRpcUrl(env, pub);
+  const rotated = rotateUrls(pub, offset);
+  return backup ? [...rotated, backup] : rotated;
+}
+
+/** Replace any of `urls` in an error message with "[rpc]" so keyed URLs never reach logs or /health. */
+function redactRpcUrls(err: unknown, urls: string[]): Error {
+  const e = err instanceof Error ? err : new Error(String(err));
+  let msg = e.message;
+  for (const url of urls) {
+    if (!url) continue;
+    msg = msg.split(url).join("[rpc]");
+    const bare = url.replace(/\/+$/, "");
+    if (bare) msg = msg.split(bare).join("[rpc]");
+    try {
+      const host = new URL(url).host;
+      if (host) msg = msg.split(host).join("[rpc]");
+    } catch {
+      // not a URL: nothing more to redact
+    }
+  }
+  if (msg === e.message) return e;
+  const out = new Error(msg) as Error & { status?: number };
+  const status = (e as { status?: number }).status;
+  if (status !== undefined) out.status = status;
+  return out;
 }
 
 export function retryAfterMs(err: unknown, attempt: number): number {
@@ -73,7 +121,7 @@ export async function withRpcFallback<T>(
       last = err;
     }
   }
-  throw last instanceof Error ? last : new Error(String(last));
+  throw redactRpcUrls(last, urls);
 }
 
 /** RPC calls give up after this long; the timeout error is retryable and fails over to the next URL. */
