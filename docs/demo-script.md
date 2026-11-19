@@ -1,9 +1,9 @@
-# Demo script (phone, 2:30)
+# Demo script (phone, 2:37)
 
 **What the video must prove:** Gemini's prediction-market odds set a Solana lending limit live, and the chain enforces it.
 
 - Recorded on a Galaxy S25 with the built-in screen recorder. No laptop needed.
-- Length: exactly 2:30. The rules allow 2 to 3 minutes, on YouTube or Google Drive, viewable by judges.
+- Length: exactly 2:37. The rules allow 2 to 3 minutes, on YouTube or Google Drive, viewable by judges.
 - Narration runs at about 2.3 words per second. Every voiceover line below fits its slot at that pace.
 - Numbers on screen are live. Read them off the screen, never from this script.
 
@@ -47,11 +47,11 @@ Record three clips, then join them. One mistake costs one clip, not the whole vi
 | B | 4 to 6 | 0:58 | Phantom's in-app browser |
 | C | 7 to 9 | 0:50 | Phantom's in-app browser, then Chrome |
 
-Join the clips in Samsung Gallery's built-in video editor (Studio). Trim dead air at the start and end of each clip so the total lands on 2:30. The menu names can differ between One UI versions; any phone video editor that joins clips works.
+Join the clips in Samsung Gallery's built-in video editor (Studio). Trim dead air at the start and end of each clip so the total lands on 2:37. The menu names can differ between One UI versions; any phone video editor that joins clips works.
 
 ## 3. Shot list
 
-Total: 2:30. Times are cumulative.
+Total: 2:37. Times are cumulative.
 
 ### Clip A (Chrome)
 
@@ -80,7 +80,7 @@ Total: 2:30. Times are cumulative.
 - Tap: **Connect**, choose Phantom, approve.
 - New wallet: tap **Open position** and approve, then **Deposit** 0.5 SOL and approve. Reused wallet: skip deposit, the position is already there.
 - Voiceover: "now a real borrow, on a phone, with phantom on devnet. i deposit half a sol as collateral. the program prices it with the same live feed."
-- If the new-wallet steps run long, cut the waiting in the editor. Keep the total at 2:30.
+- If the new-wallet steps run long, cut the waiting in the editor. Keep the total at 2:37.
 
 **Shot 5 · 1:00 to 1:22 (22 s) · over the limit, rejected**
 - Tap: drag the borrow amount up until the page says it is over the live limit.
@@ -115,10 +115,10 @@ Total: 2:30. Times are cumulative.
 - If a later measured 1-hour rate for any asset drops below 68%, the "cautious" line is no longer true: use the "Without a number" line instead.
 - Never say a number that has not been measured and written down.
 
-**Shot 9 · 2:18 to 2:30 (12 s) · close**
+**Shot 9 · 2:18 to 2:37 (19 s) · close**
 - URL: `https://github.com/ohjay-official/brace` (open in Chrome).
 - On screen: the README top, with the live app link.
-- Voiceover: "limits never pass the governance cap, bad data only lowers them, and odds never liquidate anyone. it is open source, live on devnet, and the link is below. this is brace."
+- Voiceover: "limits never pass the governance cap, bad data only lowers them, and odds never liquidate anyone. it is open source and live on devnet. devnet because it is not audited yet: real loans wait for an audit and gemini's ok on onchain data. the link is below. this is brace."
 - Do not say "odds can only tighten a limit": a calmer market lets a new confident post raise the limit, up to the 75% cap (`docs/reviews.md` Pass 5 F7).
 
 ## 4. Fallbacks
@@ -134,12 +134,12 @@ Total: 2:30. Times are cumulative.
 
 **Board says devnet is not answering:** tap **Try again**. Public devnet RPC sometimes stalls for a minute. If it lasts more than 5 minutes, check the relayer at `https://brace-relayer.ohjaye0.workers.dev/health` and docs/runbook.md.
 
-**Over 2:30 after joining:** trim pauses between taps first. Do not speed up the voice.
+**Over 2:37 after joining:** trim pauses between taps first. Do not speed up the voice.
 
 ## 5. Upload to YouTube from the phone (unlisted)
 
 1. Open the YouTube app, signed in to the account you want on the submission.
-2. Tap **+** (Create), then **Upload a video**, then pick the joined 2:30 video.
+2. Tap **+** (Create), then **Upload a video**, then pick the joined 2:37 video.
 3. Title: `Brace: prediction-market risk limits for Solana lending (UBC 2026)`.
 4. Description: paste the live app link `https://braced.vercel.app` and the repo link `https://github.com/ohjay-official/brace`.
 5. Visibility: **Unlisted**. Unlisted still lets anyone with the link watch it, which judges need. Do not pick Private.
