@@ -6804,3 +6804,15 @@ body:has(.sheet.is-open)::after {
 .site-header .brand .net {
   display: inline !important;
 }
+/* Mild blur behind the open menu: the page stays recognisable (8px, light tint); only the panel is frosted. */
+body:has(.sheet.is-open) main,
+body:has(.sheet.is-open) footer {
+  filter: none !important;
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  body:has(.sheet.is-open)::after {
+    background: color-mix(in srgb, var(--page) 20%, transparent);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
+    backdrop-filter: blur(8px) saturate(140%);
+  }
+}
