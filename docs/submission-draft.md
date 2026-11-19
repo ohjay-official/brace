@@ -111,7 +111,7 @@ Prediction markets used as risk infrastructure, not another betting app. The vol
 - Program (devnet): `Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC` on [Solana Explorer](https://explorer.solana.com/address/Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC?cluster=devnet)
 - [Rejected over-limit borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet), log `brace blocked ltv=7208 limit=6954`
 - [Accepted borrow](https://explorer.solana.com/tx/42EzMtDmmcengifcyTXjLY2BT3K1s8XCdVMEG3usorpbGiYEL5KgFHyBpWm9PyVi3Tymjg34PKqqmeCSQeJgehSf?cluster=devnet), log `ltv=2303 limit=6952`
-- 52 Rust tests (including a 3,000-action fuzz run), 109 Worker tests, 105 app tests; five review passes with no critical or high findings, every medium fixed with a test except the `initialize` front run, which the deploy script handles, and three low findings accepted
+- 52 Rust tests (including a 3,000-action fuzz run), 117 Worker tests, 105 app tests; five review passes with no critical or high findings, every medium fixed with a test except the `initialize` front run, which the deploy script handles, and three low findings accepted
 - Accuracy (preliminary): the price landed inside Brace's 1σ band 79.5% of the time and its 2σ band 97.2% over 8,303 one-hour forecasts (Nov 17 to 19); 68% and 95% would be perfect calibration, so limits run conservative
 
 ## Challenges

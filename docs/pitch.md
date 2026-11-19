@@ -61,7 +61,7 @@ TBD, and we will not pretend otherwise. The obvious path is charging lending pro
 No. It is a risk limit with a minimal pool to prove enforcement: SOL collateral, a test USD token with no value, 0% interest, full-debt liquidation only. The limit is the product.
 
 **Did you build this during the hackathon? How much was AI?**
-Yes. The first commit is Nov 15, 23:14 Lagos time, after the Nov 12 kickoff. Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions. Every change had to pass its tests: 52 Rust tests including a 3,000-action fuzz run, 109 Worker tests, 105 app tests, and five security review passes.
+Yes. The first commit is Nov 15, 23:14 Lagos time, after the Nov 12 kickoff. Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions. Every change had to pass its tests: 52 Rust tests including a 3,000-action fuzz run, 117 Worker tests, 105 app tests, and five security review passes.
 
 **Why does ZEC get a lower limit?**
 Because Gemini traders price bigger moves for it. Across Nov 17 its implied volatility ranged from 71% to 262% a year, against 27% to 66% for Bitcoin, so its limit moved between about 47% and 71% while Bitcoin stayed between about 72% and the 75% cap.
@@ -78,7 +78,7 @@ Because Gemini traders price bigger moves for it. Across Nov 17 its implied vola
 | BTC limit range | 71.8% to 75.0% (cap) | Same pull |
 | Compute for one SOL post | 40,674 units | README Proof, Explorer |
 | Relayer cost | About 0.01 devnet SOL a day | Balance change 12:24 to 15:37 WAT, Nov 17 |
-| Tests | 52 Rust, 109 Worker, 105 app | `scripts/verify.sh` on main, Nov 19 |
+| Tests | 52 Rust, 117 Worker, 105 app | `scripts/verify.sh` on main, Nov 19 |
 | Borrow attempts recorded through Streams | 5 actions, 2 rejected onchain | `/actions`, Nov 17 |
 | Borrows onchain | 10 borrows, 5 rejected onchain | Devnet RPC, Nov 19 |
 | Accuracy (preliminary) | 79.5% inside 1σ, 97.2% inside 2σ, 8,303 one-hour forecasts | Alchin's tracker on `/history`, Nov 17 to 19 |

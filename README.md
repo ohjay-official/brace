@@ -104,7 +104,7 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 | Piece | State |
 |---|---|
 | Brace program (oracle, limits, pool, liquidation) | Live on Solana devnet at the address above. 52/52 Rust tests passed on Nov 19, 2026. |
-| Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 109/109 worker tests passed on main on Nov 19, 2026. |
+| Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 117/117 worker tests passed on main on Nov 19, 2026. The live Worker runs an earlier build: the forged-history fix (audit pass 6, M3) and the backup RPC (PR #4) are on main and deploy next. |
 | Keyed backup RPC for the relayer (PR #4) | In code on main and covered by the worker tests; not yet deployed to the live Worker. |
 | Streams sink and `/history` API | Live. `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
 | Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 105/105 app tests passed on main on Nov 19, 2026. The board and History read the relayer through the app's cached `/api/history` and `/api/actions` routes. |
@@ -144,7 +144,7 @@ cargo build-sbf --manifest-path programs/brace/Cargo.toml && cargo test -p brace
 
 Use `cargo build-sbf`, not `anchor build`, in a fresh clone: `anchor build` creates a new program keypair and rewrites `declare_id`, and then the program id test fails on purpose.
 
-Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 109 worker tests and 105 app tests, re-run on main on Nov 19, 2026.
+Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 117 worker tests and 105 app tests, re-run on main on Nov 19, 2026.
 
 </details>
 
