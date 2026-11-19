@@ -475,13 +475,9 @@ code,
   color: var(--live-ink);
 }
 
-/* Brand mark: ink braces, the pen draws the limit line */
-.brace-mark {
-  color: var(--text);
+/* Brand mark: the shield logo never shrinks in a flex row */
+.logo-mark {
   flex: none;
-}
-.brace-mark .bm-line {
-  fill: var(--accent);
 }
 .brand {
   display: inline-flex;
@@ -2386,9 +2382,6 @@ code,
   font-size: 14px;
   font-weight: 500;
 }
-.ar-shield {
-  color: var(--danger);
-}
 .ar-detail {
   font-size: 13px;
   color: var(--text-2);
@@ -2481,9 +2474,6 @@ code,
 }
 .v-blocked .verdict-icon {
   border-color: var(--danger);
-}
-.v-blocked .verdict-icon .brace-mark {
-  color: var(--danger);
 }
 .v-success {
   border-color: var(--live);
@@ -5433,7 +5423,7 @@ body::before {
 .stage-read .sf-k .status {
   padding: 4px 10px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--page) 82%, transparent);
+  background: color-mix(in srgb, var(--page) 92%, transparent);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   text-shadow: none;
@@ -6468,5 +6458,75 @@ body:has(.privacy) {
 @media (max-width: 899px) {
   .linehead::before {
     animation: none;
+  }
+}
+
+/* ==== Frosted, not see-through ====
+   Glass stays, but every glass surface is a heavy frost: 88-92% of the surface colour plus a
+   strong blur, so nothing behind is legible. Without backdrop-filter the surfaces are solid.
+   The open menu also lays a frosted scrim over the whole page. */
+:root {
+  --frost: color-mix(in srgb, var(--page) 90%, transparent);
+  --frost-card: color-mix(in srgb, var(--card-solid) 88%, transparent);
+}
+.sheet,
+:root[data-theme="dark"] .sheet {
+  background: var(--card-solid);
+}
+.site-header.is-scrolled {
+  background: var(--page);
+}
+.sheet-ext a,
+.burger,
+.sheet .theme-sw {
+  background: var(--card-solid);
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .sheet,
+  :root[data-theme="dark"] .sheet {
+    background: color-mix(in srgb, var(--card-solid) 92%, transparent);
+    -webkit-backdrop-filter: blur(32px) saturate(160%);
+    backdrop-filter: blur(32px) saturate(160%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .sheet {
+      background: color-mix(in srgb, var(--card-solid) 92%, transparent);
+    }
+  }
+  .site-header.is-scrolled,
+  :root[data-theme="dark"] .site-header.is-scrolled {
+    background: var(--frost);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    backdrop-filter: blur(28px) saturate(160%);
+  }
+  .burger,
+  :root[data-theme="dark"] .burger,
+  .sheet-ext a,
+  .sheet .theme-sw {
+    background: var(--frost-card);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+  }
+  .glass,
+  .card-lit {
+    background: var(--frost-card);
+    -webkit-backdrop-filter: blur(28px) saturate(150%);
+    backdrop-filter: blur(28px) saturate(150%);
+  }
+}
+/* A frosted scrim under the open menu, above the page and below the header. */
+body:has(.sheet.is-open)::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: var(--page);
+  pointer-events: none;
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  body:has(.sheet.is-open)::after {
+    background: color-mix(in srgb, var(--page) 92%, transparent);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
   }
 }

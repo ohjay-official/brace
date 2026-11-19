@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Check, ShieldX } from "lucide-react";
-import { BraceMark } from "@/components/ui/BraceMark";
+import { ArrowUpRight, Check } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
 import { CopyField } from "@/components/ui/CopyField";
 import { HistoryChart } from "@/components/HistoryChart";
 import { fetchWithTimeout, friendlyNetError } from "@/lib/net";
@@ -122,12 +122,11 @@ export function HistoryView() {
             {shown.map((row) => (
               <li key={`${row.href}-${row.ts}`} className={`arow2 ${row.ok ? "is-ok" : "is-blocked"}`}>
                 <span className="ar-icon" aria-hidden>
-                  {row.ok ? <Check size={16} /> : <BraceMark size={20} />}
+                  {row.ok ? <Check size={16} /> : <Logo size={20} />}
                 </span>
                 <div className="ar-body">
                   <span className="ar-label">
                     {row.ok ? "Accepted" : "Blocked by the program"}
-                    {!row.ok && <ShieldX size={14} aria-hidden className="ar-shield" />}
                   </span>
                   <span className="ar-detail">{row.detail}</span>
                   <span className="ar-when">{row.when}</span>
