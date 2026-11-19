@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMeta } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
 import { PageHead } from "@/components/ui/PageHead";
 import { ProofLog } from "@/components/v2/ProofLog";
 import { AboutSpy } from "@/components/v2/AboutSpy";
 
-export const metadata: Metadata = { title: "About", alternates: { canonical: "/about" } };
+export const metadata: Metadata = pageMeta(
+  "About",
+  "How Brace works: Gemini prediction market ladders posted every minute, implied volatility fitted onchain on Solana, and a borrow limit that tightens before the market moves.",
+  "/about",
+);
 
 const SECTIONS = [
   { id: "problem", n: "01", t: "The problem" },

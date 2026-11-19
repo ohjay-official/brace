@@ -6143,3 +6143,85 @@ body::before,
     width: 100%;
   }
 }
+
+/* Privacy: one readable column, the about page's type scale. */
+.privacy-body {
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding-bottom: 96px;
+}
+.privacy-body section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.privacy-body h2 {
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.privacy-body p,
+.privacy-body li {
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--text-2);
+}
+.privacy-body ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 20px;
+  list-style: disc;
+}
+.privacy-body a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.privacy-body .privacy-note {
+  font-size: 13px;
+  color: var(--accent-ink);
+  border: 1px solid var(--hair-2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  align-self: flex-start;
+}
+.privacy-body .privacy-date {
+  font-size: 14px;
+  color: var(--text-3);
+}
+
+/* Header at every width: the menu button is always there, so every page is one tap away
+   even where the inline links do not fit (tablet landscape, Safari's wider text).
+   Inline links only from 1280px, GitHub only from 1400px, and the links never fade in:
+   an entrance that stalls must not leave the nav invisible. */
+.menu {
+  display: block !important;
+}
+.nav-links {
+  min-width: 0;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.site-header .nav-links a {
+  animation: none !important;
+  opacity: 1;
+}
+@media (max-width: 1279px) {
+  .nav-links {
+    display: none !important;
+  }
+}
+@media (max-width: 1399px) {
+  .nav-ext {
+    display: none !important;
+  }
+}
+@media (min-width: 1100px) {
+  .nav-theme {
+    display: inline-flex !important;
+  }
+}

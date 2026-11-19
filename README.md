@@ -63,7 +63,7 @@ Expected, from a fresh run on Nov 19, 2026 (Africa/Lagos): 52 Rust tests pass (1
 - **History from QuickNode Streams:** [https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL](https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL). The [History page](https://braced.vercel.app/history) charts the last 24 hours of SOL's effective limit and implied volatility from that feed, and lists blocked and allowed borrows from [`/actions`](https://brace-relayer.ohjaye0.workers.dev/actions).
 - **The math works on real Gemini data.** A captured SOL ladder used as a test fixture fits onchain to 82.7% implied volatility and a 69.6% limit (`sigma_bps` 8272, `max_ltv_bps` 6960), matching an independent float reference ([`programs/brace/tests/oracle.rs`](programs/brace/tests/oracle.rs), [`src/math.rs`](programs/brace/src/math.rs) unit tests).
 - **Reviewed five times** by separate reviewers, findings fixed with a test each ([`docs/reviews.md`](docs/reviews.md)).
-- **Accuracy this week:** Placeholder: Alchin's 1-hour band hit rate will be added here once the tracker has a measured number. No figure yet.
+- **Accuracy (Alchin's tracker, [`tracker/`](tracker/)):** across 8,303 one hour forecasts posted between Nov 17 04:59 and Nov 19 03:22 Lagos, the price stayed inside Brace's 1σ band 79.47% of the time and inside 2σ 97.21% (a perfectly calibrated band would hold about 68% and 95%). Counting only non overlapping hourly forecasts: 1σ 135/164 (82.32%), 2σ 160/164 (97.56%). So the limits run conservative, which is the safe side for a lender. Per asset 1σ: SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 24 hour results are preliminary because of feed gaps; BTC was under the target at 24h on this sample.
 
 ## What's New Here
 
@@ -117,7 +117,7 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 | Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 95/95 worker tests passed on Nov 19, 2026. |
 | Streams sink and `/history` API | Live. `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
 | Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 85/85 app tests passed on Nov 19, 2026. |
-| Accuracy tracker (Python) | In progress by Alchin. No measured hit rate in this README yet. |
+| Accuracy tracker (Python, [`tracker/`](tracker/)) | Measured by Alchin from a live `/history` pull at 04:22 Lagos, Nov 19: 1σ band held 79.47% and 2σ 97.21% across 8,303 one hour forecasts (see Proof It's Real). |
 
 ## How the Sponsor Tech Is Used
 
@@ -205,7 +205,7 @@ Reviewed in five separate passes (correctness, access control, financial logic, 
 - Runtime: Anchor 1.2.2 (`anchor-lang`, `anchor-spl` with SPL Token), `@solana/web3.js` 1.99.0, Next.js 15.5.29, React 19.3.1.
 - Development: LiteSVM 0.15.0, Vitest 5.1.0 (app and worker), TypeScript 5.9.3, Wrangler 4.163.0.
 - Services: Gemini Prediction Markets public API, Solana devnet, Cloudflare Workers, QuickNode Streams, Vercel.
-- Team: Oh-Jay (build), Alchin Daryabari and Omar Dosuyev (pitch, accuracy tracker).
+- Team: Oh-Jay led development, Alchin Daryabari built the forecast validation and analytics tracker, and Omar Dosuyev led the presentation.
 
 ## License
 

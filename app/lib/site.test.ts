@@ -15,7 +15,7 @@ describe("launch basics", () => {
 
   test("sitemap lists every public route on the site url, and never the dev route", () => {
     const urls = sitemap().map((e) => e.url);
-    for (const p of ["", "/borrow", "/history", "/about", "/asset/SOL", "/asset/BTC", "/asset/ETH", "/asset/XRP", "/asset/ZEC"]) {
+    for (const p of ["", "/borrow", "/history", "/about", "/privacy", "/asset/SOL", "/asset/BTC", "/asset/ETH", "/asset/XRP", "/asset/ZEC"]) {
       expect(urls).toContain(`${SITE_URL}${p}`);
     }
     expect(urls.some((u) => u.includes("dev-preview"))).toBe(false);
@@ -56,5 +56,16 @@ describe("launch basics", () => {
       i += 2 + len;
     }
     expect(size).toEqual([1200, 630]);
+  });
+});
+
+describe("per page metadata", () => {
+  test("pageMeta keeps the share image and gives each page its own text", async () => {
+    const { pageMeta } = await import("./site");
+    const m = pageMeta("Privacy", "What Brace touches.", "/privacy");
+    expect(m.alternates.canonical).toBe("/privacy");
+    expect(m.openGraph.images[0]).toMatchObject({ url: "/opengraph-image.jpg", width: 1200, height: 630 });
+    expect(m.twitter.images[0]).toMatchObject({ url: "/twitter-image.jpg" });
+    expect(m.openGraph.title).toBe("Privacy | Brace");
   });
 });

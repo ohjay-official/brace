@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import { pageMeta } from "@/lib/site";
 import { HistoryView } from "@/components/HistoryView";
 import { PageHead } from "@/components/ui/PageHead";
 
-export const metadata: Metadata = { title: "History", alternates: { canonical: "/history" } };
+export const metadata: Metadata = pageMeta(
+  "History",
+  "24 hours of Brace limits for SOL, BTC, ETH, XRP and ZEC, with every borrow and every refused borrow on Solana devnet.",
+  "/history",
+);
 
 export default function HistoryPage() {
   return (

@@ -73,6 +73,7 @@ const LINKS = [
   { href: "/borrow", label: "Borrow" },
   { href: "/history", label: "History" },
   { href: "/about", label: "About" },
+  { href: "/privacy", label: "Privacy" },
 ];
 
 /** Every section and page, for the top nav and the menu sheet. */
