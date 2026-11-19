@@ -21,12 +21,11 @@ import {
 
 type LoadState = "loading" | "ok" | "error";
 
-class HttpError extends Error {}
-
 const POLL_MS = 30_000;
 
 export function HistoryView() {
   const [status, setStatus] = useState<LoadState>("loading");
+  const [actStatus, setActStatus] = useState<LoadState>("loading");
   const [error, setError] = useState<string | null>(null);
   const [points, setPoints] = useState<ChartPoint[]>([]);
   const [actions, setActions] = useState<ActionRecord[]>([]);
@@ -37,25 +36,32 @@ export function HistoryView() {
     const load = async () => {
       const now = Math.floor(Date.now() / 1000);
       const since = now - HISTORY_WINDOW_SECS;
-      try {
-        const [histRes, actRes] = await Promise.all([
-          fetchWithTimeout(appHistoryUrl("SOL", since)),
-          fetchWithTimeout(appActionsUrl(since)),
-        ]);
-        if (!histRes.ok || !actRes.ok) throw new HttpError();
-        const [histBody, actBody] = await Promise.all([histRes.json(), actRes.json()]);
-        const rows = parseHistory(histBody);
-        const acts = parseActions(actBody);
-        if (!alive) return;
-        setPoints(seriesForChart(rows, now));
-        setActions(borrowActions(acts));
+      // The chart and the borrow list load independently, so one failing never hides the other.
+      const read = async (url: string) => {
+        try {
+          const res = await fetchWithTimeout(url);
+          if (!res.ok) return { error: "The history service sent back an error." };
+          return { body: (await res.json()) as unknown };
+        } catch (e) {
+          return { error: friendlyNetError(e, "the history service") };
+        }
+      };
+      const [hist, act] = await Promise.all([read(appHistoryUrl("SOL", since)), read(appActionsUrl(since))]);
+      if (!alive) return;
+      if ("body" in hist) {
+        setPoints(seriesForChart(parseHistory(hist.body), now));
         setBounds({ t0: since, t1: now });
-        setError(null);
         setStatus("ok");
-      } catch (e) {
-        if (!alive) return;
-        setError(e instanceof HttpError ? "The history service sent back an error." : friendlyNetError(e, "the history service"));
+      } else {
         setStatus((prev) => (prev === "ok" ? "ok" : "error"));
+      }
+      if ("body" in act) {
+        setActions(borrowActions(parseActions(act.body)));
+        setActStatus("ok");
+        setError(null);
+      } else {
+        setError(act.error ?? null);
+        setActStatus((prev) => (prev === "ok" ? "ok" : "error"));
       }
     };
     load();
@@ -99,14 +105,14 @@ export function HistoryView() {
             </div>
           )}
         </div>
-        {status === "loading" && !formatted.length ? (
+        {actStatus === "loading" && !formatted.length ? (
           <div className="skel-list" role="status" aria-busy="true">
             <span className="sr-only">Reading QuickNode Streams.</span>
             <span className="skel skel-row" />
             <span className="skel skel-row" />
             <span className="skel skel-row" />
           </div>
-        ) : status === "error" && !formatted.length ? (
+        ) : actStatus === "error" && !formatted.length ? (
           <div className="notice is-error" role="status">
             <strong>Could not load borrows</strong>
             <span className="muted">{error ?? ""} This page tries again every 30 seconds.</span>
