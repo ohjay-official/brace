@@ -62,7 +62,7 @@ Expected, from a fresh run on Nov 19, 2026 (Africa/Lagos): 52 Rust tests pass (1
   - Accepted borrow of 8.30 test USD, log `brace borrow ... ltv=2303 limit=6952`: [Explorer](https://explorer.solana.com/tx/42EzMtDmmcengifcyTXjLY2BT3K1s8XCdVMEG3usorpbGiYEL5KgFHyBpWm9PyVi3Tymjg34PKqqmeCSQeJgehSf?cluster=devnet) (10:24).
 - **History from QuickNode Streams:** [https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL](https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL). The [History page](https://braced.vercel.app/history) charts the last 24 hours of SOL's effective limit and implied volatility from that feed, and lists blocked and allowed borrows from [`/actions`](https://brace-relayer.ohjaye0.workers.dev/actions).
 - **The math works on real Gemini data.** A captured SOL ladder used as a test fixture fits onchain to 82.7% implied volatility and a 69.6% limit (`sigma_bps` 8272, `max_ltv_bps` 6960), matching an independent float reference ([`programs/brace/tests/oracle.rs`](programs/brace/tests/oracle.rs), [`src/math.rs`](programs/brace/src/math.rs) unit tests).
-- **Reviewed five times** by separate reviewers, findings fixed with a test each ([`docs/reviews.md`](docs/reviews.md)).
+- **Reviewed five times** by separate reviewers: medium findings fixed with a test (the `initialize` front run is handled by the deploy script instead), three low findings accepted ([`docs/reviews.md`](docs/reviews.md)).
 - **Accuracy (Alchin's tracker, [`tracker/`](tracker/)):** across 8,303 one hour forecasts posted between Nov 17 04:59 and Nov 19 03:22 Lagos, the price stayed inside Brace's 1σ band 79.47% of the time and inside 2σ 97.21% (a perfectly calibrated band would hold about 68% and 95%). Counting only non overlapping hourly forecasts: 1σ 135/164 (82.32%), 2σ 160/164 (97.56%). So the limits run conservative, which is the safe side for a lender. Per asset 1σ: SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 24 hour results are preliminary because of feed gaps; BTC was under the target at 24h on this sample.
 
 ## What's New Here
@@ -71,7 +71,7 @@ Expected, from a fresh run on Nov 19, 2026 (Africa/Lagos): 52 Rust tests pass (1
 
 Forward-looking volatility feeds today usually come from options markets. Gemini already lists daily and hourly price ladders on assets the live board posts, including ZEC.
 
-- **The math runs onchain.** The relayer posts Gemini's raw bid and ask quotes; the program does the fit with integers only (probit lookup table, least squares, square roots). The relayer can't fake a volatility number.
+- **The math runs onchain.** The relayer posts Gemini's raw bid and ask quotes; the program does the fit with integers only (probit lookup table, least squares, square roots). The relayer never posts a volatility number, but the quotes themselves are trusted: nothing onchain proves they came from Gemini. The program bounds what a bad ladder can do: the limit is clamped between 30% and 75%, and spot must sit within 3% of the fitted median (see [Known Limitations](#known-limitations)).
 - **Fail safe, not fail open.** Thin, stale or inconsistent data never loosens a limit: it holds, then steps down 2.5 points every 5 minutes. After an hour with no fresh data, borrowing and liquidation stop.
 - **Odds never liquidate.** Liquidation uses only the fixed 80% threshold.
 - **Real-time history.** QuickNode Streams delivers every program transaction, including failed borrows, to the history feed.
@@ -171,13 +171,18 @@ Each Gemini contract "price ≥ K at expiry" trades at a probability. Under a lo
 
 ## Security
 
-Reviewed in five separate passes (correctness, access control, financial logic, adversarial cases, independent final). No critical or high findings. Every medium and low finding was fixed with a test that reproduces it. Full log: [`docs/reviews.md`](docs/reviews.md).
+Reviewed in five separate passes (correctness, access control, financial logic, adversarial cases, independent final). No critical or high findings. Every medium finding was fixed with a test that reproduces it, except the `initialize` front run, which the deploy script handles and Known Limitations lists. Three low findings from the final pass (F3, F4, F5) are accepted and listed in `docs/reviews.md`. Full log: [`docs/reviews.md`](docs/reviews.md).
 
 ### Known Limitations
 
 - **The relayer is trusted** for quotes and the spot price. Mitigations: spot only moves on confident posts, must sit within 3% of the ladder's implied median, and goes stale after an hour.
 - **`initialize` can be front-run** between deploy and setup. Deploy, initialize and pool setup run back to back from one script, and the stored admin is checked afterwards.
 - **Liquidation repays the full debt** only. Test USD has no value.
+- **Liquidation pauses on a stale price.** In a fast crash the fits can go non-confident, so spot stops updating; an hour after the last confident post, `liquidate` fails with `StalePrice` and positions can build bad debt. That is the cost of failing safe.
+- **No write-off for deeply underwater positions.** Liquidation pays the debt plus a 5% bonus in SOL, capped at the collateral, so above about 95% LTV the bonus shrinks and above 100% liquidating loses money. There is no instruction to write such a position off.
+- **Borrows can price collateral with spot up to an hour old.** The limit decays toward the 50% stale floor meanwhile (2.5 points every 5 minutes), but the price itself is not refreshed.
+- **Thin ladders can be leaned on.** A post counts with only 3 two-sided quotes and spreads up to 15 cents, so a few quotes could pull the fitted volatility down; the limit that results is still capped at 75%.
+- **The relayer is a single trusted key.** One keypair posts every feed; there is no quorum or second source.
 - **Interest is 0%.** This is a risk-limit demo, not a full lending market.
 - **Devnet only.** Gemini liquidity is thin: quotes exist, trades are rare, which is why confidence scoring and fail-safe staleness exist.
 - **Phantom simulation of an over-limit borrow.** Phantom simulates before it signs, and the program refuses an over-limit borrow, so Phantom shows "Failed to simulate the results of this request". The user has to confirm past that warning for the rejected transaction to land onchain; the borrow page explains each tap first. Phantom also shows a new-domain notice for any site it has not reviewed yet.
