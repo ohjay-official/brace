@@ -6,6 +6,8 @@ import { SYMBOLS, type Symbol } from "@/lib/brace";
 import { RELAYER_URL, parseHistory } from "@/lib/history";
 import { appHistoryUrl } from "@/lib/relay-config";
 import { fetchWithTimeout } from "@/lib/net";
+import { DEFAULT_RPC } from "@/lib/brace";
+import { latestOkSig, signaturesRequest, type LatestSig } from "@/lib/relayer-sig";
 
 /** Live Gemini quotes for one ladder, from /api/ladder, every 30 seconds. Same contract as before the redesign. */
 export type Ladder = { state: "loading" | "ok" | "unavailable"; quotes: LadderQuote[] };
@@ -120,6 +122,36 @@ export function useHealth(): { health: Health | null; failed: boolean } {
     };
   }, []);
   return { health, failed };
+}
+
+/** The relayer's newest successful transaction, straight from devnet (each post covers every feed). */
+export function useLatestRelayerPost(relayer: string | null): LatestSig | null {
+  const [latest, setLatest] = useState<LatestSig | null>(null);
+  useEffect(() => {
+    if (!relayer) return;
+    let alive = true;
+    const rpc = process.env.NEXT_PUBLIC_RPC_URL || DEFAULT_RPC;
+    const load = async () => {
+      try {
+        const res = await fetchWithTimeout(rpc, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(signaturesRequest(relayer)),
+        });
+        const got = latestOkSig(await res.json());
+        if (alive && got) setLatest(got);
+      } catch {
+        /* keep the last one */
+      }
+    };
+    load();
+    const id = setInterval(load, 60_000);
+    return () => {
+      alive = false;
+      clearInterval(id);
+    };
+  }, [relayer]);
+  return latest;
 }
 
 /** Element width from a ResizeObserver, for SVGs drawn in real pixels. */

@@ -5,7 +5,7 @@ import { PROGRAM_ID, REPO_URL, SYMBOLS, explorerAddress, relTime } from "@/lib/b
 import { RELAYER_URL, explorerTx } from "@/lib/history";
 import { useBoard } from "../BoardProvider";
 import { CopyField } from "../ui/CopyField";
-import { shortSig, useHealth } from "./live";
+import { shortSig, useHealth, useLatestRelayerPost } from "./live";
 
 /**
  * The relayer's own log, read from /health: the last transaction it landed for
@@ -13,17 +13,21 @@ import { shortSig, useHealth } from "./live";
  */
 export function ProofLog() {
   const { health, failed } = useHealth();
-  const { now } = useBoard();
+  const { now, state } = useBoard();
+  const latest = useLatestRelayerPost(state?.kind === "ok" ? state.config.relayer : null);
+  /** /health only knows what its own Worker instance sent; devnet always has the newest post. */
+  const sigFor = (s: (typeof SYMBOLS)[number]) => health?.feeds[s]?.lastSig ?? latest?.sig ?? null;
   const t = now || Math.floor(Date.now() / 1000);
   const id = PROGRAM_ID.toBase58();
   const tape = SYMBOLS.flatMap((s) => {
     const f = health?.feeds[s];
-    return f?.lastSig
+    const sig = sigFor(s);
+    return sig
       ? [
           {
             s,
-            sig: f.lastSig,
-            age: f.lastPostTs ? relTime(t - f.lastPostTs) : "",
+            sig,
+            age: f?.lastPostTs ? relTime(t - f.lastPostTs) : "",
           },
         ]
       : [];
@@ -57,6 +61,7 @@ export function ProofLog() {
             </div>
             {SYMBOLS.map((s) => {
               const f = health?.feeds[s];
+              const sig = sigFor(s);
               return (
                 <div key={s} className="pl-row" role="row">
                   <span role="cell" className="pl-sym">
@@ -64,9 +69,9 @@ export function ProofLog() {
                   </span>
                   <span role="cell">{f?.lastPostTs ? relTime(t - f.lastPostTs) : failed ? "relayer not answering" : health ? "no post yet" : "reading"}</span>
                   <span role="cell">
-                    {f?.lastSig ? (
-                      <a href={explorerTx(f.lastSig)} target="_blank" rel="noopener noreferrer" className="pl-tx">
-                        {shortSig(f.lastSig)} <ArrowUpRight size={14} aria-hidden />
+                    {sig ? (
+                      <a href={explorerTx(sig)} target="_blank" rel="noopener noreferrer" className="pl-tx">
+                        {shortSig(sig)} <ArrowUpRight size={14} aria-hidden />
                         <span className="sr-only"> on Solana Explorer</span>
                       </a>
                     ) : (
@@ -82,8 +87,10 @@ export function ProofLog() {
               ? "The relayer is not answering right now. The limits above still come straight from devnet."
               : health?.lastError
                 ? `Relayer's last error, as it logged it: ${health.lastError}. Limits hold or step down until it clears.`
-                : health
+                : health?.lastRun
                   ? "No relayer errors on the last run."
+                  : health
+                    ? "Transactions above come straight from devnet."
                   : "Reading the relayer log"}
           </p>
         </div>

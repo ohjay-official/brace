@@ -11,7 +11,7 @@ Paste-ready fields for https://ubc-hackathon-2026.devpost.com. Checked against t
 | Video link (YouTube, unlisted, 2 to 3 min) | Must be recorded on the phone (docs/demo-script.md) | Video demo link field; README line 19 |
 | Omar's Devpost account | Teammates are added by Devpost invite and must accept it | Team section |
 | Alchin's Devpost account | Same | Team section |
-| Alchin's hit rate, or confirm there is none | Never invent it | Story Proof list, README Proof section, video shot 8 |
+| Alchin's hit rate | Done: 79.5% inside 1σ over 8,303 one-hour forecasts (preliminary) | Story Proof list, README Proof section, video shot 8 |
 | Grok Bot bounty: yes or no | Needs a Grok Bot chat export only Oh-Jay can download, see below | Bounty choice |
 | Who attends in person on Sat Nov 21 | Rules: participants must be present in person during final presentations to qualify for prizes. Oh-Jay is remote, so Alchin and Omar need to be there. Ask the organizers on Telegram if a remote member affects eligibility | Not a form field |
 | reCAPTCHA, terms checkbox, Submit | Needs a person | Last step |
@@ -22,7 +22,7 @@ Paste-ready fields for https://ubc-hackathon-2026.devpost.com. Checked against t
 |---|---|---|---|
 | Project name | Brace | 5 | 60 |
 | Tagline (elevator pitch) | Gemini prediction markets as an onchain volatility oracle that tightens Solana lending limits before the market moves. | 118 | 200 on the participant form; 140 in Devpost's host docs, so this stays under 140 |
-| Thumbnail | `app/app/opengraph-image.png` (1200x630). Devpost suggests 3:2, 5 MB max; the image is 55 KB; check the crop in the preview | | |
+| Thumbnail | `app/app/opengraph-image.jpg` (1200x630). Devpost suggests 3:2, 5 MB max; the image is 87 KB; check the crop in the preview | | |
 
 ## Step 2: Track, chain award, bounties, prize opt-ins
 
@@ -63,7 +63,7 @@ The guide asks for five written answers. If the form has separate boxes, paste e
 **What did you build?** (497 chars)
 
 ```text
-Brace is a live risk oracle and a small lending pool on Solana devnet. Every minute it reads Gemini's "price X or above" prediction market ladders for SOL, BTC, ETH, XRP and ZEC, works out the implied volatility onchain, and turns it into a loan-to-value limit. The pool enforces that limit on every borrow: over the limit, the program rejects the transaction; under it, the borrow goes through. A public risk board, a borrow page that works in Phantom on a phone, and a history page show it live.
+Brace is a live risk oracle and a small lending pool on Solana devnet. Every minute it reads Gemini's "price X or above" prediction market ladders for SOL, BTC, ETH, XRP and ZEC, works out the implied volatility onchain, and turns each into a loan-to-value limit. The demo pool takes SOL collateral and enforces SOL's limit on every borrow: over the limit, the program rejects the transaction; under it, the borrow goes through. A public risk board, a borrow page that works in Phantom on a phone, and a history page show it live.
 ```
 
 **What problem does it solve?** (469 chars)
@@ -81,13 +81,13 @@ A Cloudflare Worker reads Gemini's public prediction market API once a minute an
 **What makes it unique?** (451 chars)
 
 ```text
-Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, and every limit is clamped between 30% and a 75% cap. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour. Odds never liquidate anyone; liquidation stays at a fixed 80%. And it covers assets with no options market, like ZEC, because Gemini lists them.
+Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, and every limit is clamped between 30% and a 75% cap. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour without a confident post. Odds never liquidate anyone; liquidation stays at the 80% threshold in the config. And it covers assets with no options on Deribit, the largest crypto options venue, like ZEC, because Gemini lists them.
 ```
 
 **What would you build next?** (356 chars)
 
 ```text
-A check_borrow instruction other Solana lending programs can call by CPI, so any market can use the limit. Signed or multi-source quotes so the relayer is no longer trusted. Measured accuracy: Alchin's tracker scores each limit against the moves that actually happened. Then more assets as Gemini lists them, and a mainnet pilot with a real lending market.
+A check_borrow instruction other Solana lending programs can call by CPI, so any market can use the limit. Signed or multi-source quotes so the relayer is no longer trusted. A longer, non-overlapping track record from Alchin's tracker. Then more assets as Gemini lists them, and a mainnet pilot with a real lending market.
 ```
 
 ## Step 4: Project story (About the project, markdown) (3840 chars)
@@ -99,31 +99,32 @@ No hard limit is published for this field. Paste everything between the fences.
 Lending markets set loan-to-value limits by governance vote and rarely change them. When volatility arrives, limits are still the calm-week numbers, so the protection arrives after the move. Forward-looking volatility usually comes from options markets, which most long-tail assets do not have. Gemini's prediction markets already price where these assets will be at expiry, including ZEC, so Brace uses those odds to tighten limits before the move instead of after it.
 
 ## What it does
-Brace is a live risk oracle and a small lending pool on Solana devnet. Every minute it reads Gemini's "price X or above" prediction market ladders for SOL, BTC, ETH, XRP and ZEC, works out the implied volatility onchain, and turns it into a loan-to-value limit. The pool enforces that limit on every borrow: over the limit, the program rejects the transaction; under it, the borrow goes through. A public risk board, a borrow page that works in Phantom on a phone, and a history page show it live.
+Brace is a live risk oracle and a small lending pool on Solana devnet. Every minute it reads Gemini's "price X or above" prediction market ladders for SOL, BTC, ETH, XRP and ZEC, works out the implied volatility onchain, and turns each into a loan-to-value limit. The demo pool takes SOL collateral and enforces SOL's limit on every borrow: over the limit, the program rejects the transaction; under it, the borrow goes through. A public risk board, a borrow page that works in Phantom on a phone, and a history page show it live.
 
 ## How we built it
 A Cloudflare Worker reads Gemini's public prediction market API once a minute and posts the raw bid and ask quotes to an Anchor program on Solana devnet. The program does the math with integers only: it turns each probability into a z-score, fits a line across the strikes, reads off implied volatility and the implied median, checks spot against that median, and sets limit = 80% x (1 - 3 x the 24-hour move), capped at 75%. Borrow and withdraw check that limit. A QuickNode Stream on the Block dataset, filtered to the program, sends every transaction, including rejected borrows, to the Worker, which stores it in D1 and serves the history the app charts.
 
 ## What makes it different
-Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, and every limit is clamped between 30% and a 75% cap. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour. Odds never liquidate anyone; liquidation stays at a fixed 80%. And it covers assets with no options market, like ZEC, because Gemini lists them.
+Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, and every limit is clamped between 30% and a 75% cap. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour without a confident post. Odds never liquidate anyone; liquidation stays at the 80% threshold in the config. And it covers assets with no options on Deribit, the largest crypto options venue, like ZEC, because Gemini lists them.
 
 ## Proof
 - Program (devnet): `Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC` on [Solana Explorer](https://explorer.solana.com/address/Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC?cluster=devnet)
 - [Rejected over-limit borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet), log `brace blocked ltv=7208 limit=6954`
 - [Accepted borrow](https://explorer.solana.com/tx/42EzMtDmmcengifcyTXjLY2BT3K1s8XCdVMEG3usorpbGiYEL5KgFHyBpWm9PyVi3Tymjg34PKqqmeCSQeJgehSf?cluster=devnet), log `ltv=2303 limit=6952`
-- 52 Rust tests (including a 3,000-action fuzz run), 76 Worker tests, 72 app tests; five separate security review passes, every finding fixed with a test
+- 52 Rust tests (including a 3,000-action fuzz run), 109 Worker tests, 105 app tests; five review passes with no critical or high findings, every medium fixed with a test except the `initialize` front run, which the deploy script handles, and three low findings accepted
+- Accuracy (preliminary): the price landed inside Brace's 1σ band 79.5% of the time and its 2σ band 97.2% over 8,303 one-hour forecasts (Nov 17 to 19); 68% and 95% would be perfect calibration, so limits run conservative
 
 ## Challenges
-Gemini's ladders are thin: quotes exist but trades are rare. That is why every post gets a confidence check and stale data only ever lowers a limit. Fitting a probit curve with integer math inside Solana's compute budget took a lookup table and a careful least-squares fit; a SOL post uses about 40,700 compute units.
+Gemini's ladders are thin: quotes exist but trades are rare. That is why every post gets a confidence check and stale data only ever lowers a limit. Fitting a probit curve with integer math inside Solana's compute budget took a lookup table and a careful least-squares fit; a verified SOL post used 40,674 compute units on Nov 17, and each asset's fit runs at about 35,000 to 41,000.
 
 ## What's next
-A check_borrow instruction other Solana lending programs can call by CPI, so any market can use the limit. Signed or multi-source quotes so the relayer is no longer trusted. Measured accuracy: Alchin's tracker scores each limit against the moves that actually happened. Then more assets as Gemini lists them, and a mainnet pilot with a real lending market.
+A check_borrow instruction other Solana lending programs can call by CPI, so any market can use the limit. Signed or multi-source quotes so the relayer is no longer trusted. A longer, non-overlapping track record from Alchin's tracker. Then more assets as Gemini lists them, and a mainnet pilot with a real lending market.
 
 ## Built with AI
-Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions and handled every wallet and account step. Every change passed its tests before merge.
+Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions and handled every wallet and account step. Each task was gated on its tests before it was committed.
 ````
 
-If Alchin has a measured hit rate, add one line to the Proof list: `- Accuracy: [exact result from Alchin, with what it measures]`.
+The accuracy line is in the Proof list above.
 
 ## Step 5: Built with (15 tags, Devpost max 25)
 
@@ -147,7 +148,7 @@ solana, anchor, rust, typescript, next.js, react, vercel, cloudflare-workers, cl
 ## Step 7: Image gallery (optional, 3:2 suggested)
 
 - `docs/images/board.png` (the README phone shot of the board)
-- `app/app/opengraph-image.png`
+- `app/app/opengraph-image.jpg`
 - Fresh phone screenshots from the recording day: the asset page, the rejected-borrow message, the History page.
 
 ## Optional: Grok Bot bounty
@@ -155,7 +156,7 @@ solana, anchor, rust, typescript, next.js, react, vercel, cloudflare-workers, cl
 The guide asks for: Grok Bot as a core part of the project, a Grok Bot chat export showing how you built or used it, and a 3 to 4 sentence README section on its role. The workshop schedule doc links Grok Bot to Cursor (cursor.com/docs/grok-bot), which is the assistant that did much of this build: the ship check, Worker deploys and the rollback drill through the Cloudflare connector, tests and docs. It is a build tool here, not part of the running product, so judges may weigh it lower than projects that ship Grok Bot to users. Opting in costs nothing and stacks with other prizes. Only Oh-Jay can export the chat. If he opts in, add this to the README:
 
 ```text
-Grok Bot did real build work on Brace. It ran the pre-submission ship check end to end, wrote and ran the Worker and app tests, deployed the relayer Worker through the Cloudflare connector, and verified every live endpoint and onchain transaction before each change shipped, including a live rollback drill of the Worker. Oh-Jay directed the work and made the product decisions; every change passed its tests before merge. The chat export is linked here: [[LINK]].
+Grok Bot did real build work on Brace. It ran the pre-submission ship check end to end, wrote and ran the Worker and app tests, deployed the relayer Worker through the Cloudflare connector, and verified every live endpoint and onchain transaction before each change shipped, including a live rollback drill of the Worker. Oh-Jay directed the work and made the product decisions; each task was gated on its tests before it was committed. The chat export is linked here: [[LINK]].
 ```
 
 ## Check before pressing Submit

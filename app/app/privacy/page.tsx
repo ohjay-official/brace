@@ -39,7 +39,7 @@ export default function PrivacyPage() {
         <section aria-labelledby="pv-browser">
           <h2 id="pv-browser">In your browser</h2>
           <p>
-            One setting is saved in your browser&apos;s local storage: your light or dark theme choice, under <span className="mono">brace-theme</span>. Brace sets no
+            Up to two settings are saved in your browser&apos;s local storage: your light or dark theme choice, under <span className="mono">brace-theme</span>, and, once you connect a wallet, which wallet you picked, under <span className="mono">walletName</span>, so it can reconnect. Brace sets no
             cookies.
           </p>
         </section>
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
           <h2 id="pv-services">Services your browser talks to</h2>
           <ul>
             <li>Vercel hosts this site and keeps standard request logs.</li>
-            <li>The Brace relayer on Cloudflare Workers serves the History and live feeds. It holds your IP address in memory for about a minute to rate limit requests, and does not store it.</li>
+            <li>The Brace relayer on Cloudflare Workers serves the live feed health your browser reads, and the History data this site fetches for you. To rate limit requests, the relayer and this site&apos;s own API routes keep your IP address in server memory, never in a database, until that server process recycles.</li>
             <li>A Solana devnet RPC node answers the reads for the live board and your wallet.</li>
             <li>Gemini prediction market quotes are fetched by our server, so your browser never calls Gemini.</li>
           </ul>

@@ -8,7 +8,8 @@ const DIGITS = "0123456789";
  * Shows a formatted value (for example "69.6%"). When a new real reading
  * arrives, each digit rolls to its new place. The first render shows the
  * value directly: it never counts up from zero. Screen readers get the plain
- * text once; nothing here is an aria-live region.
+ * text once; nothing here is an aria-live region. The rolling digits are drawn
+ * from data-ch with CSS, so page text (and bots reading it) holds the value once.
  */
 export function RollingNumber({ value, className = "" }: { value: string; className?: string }) {
   const reduced = useReducedMotion();
@@ -32,10 +33,10 @@ export function RollingNumber({ value, className = "" }: { value: string; classN
             <span key={`${i}-${chars.length}`} className="roll-col">
               <span className="roll-strip" style={{ transform: `translateY(${-d * 10}%)` }}>
                 {DIGITS.split("").map((n) => (
-                  <span key={n}>{n}</span>
+                  <span key={n} data-ch={n} />
                 ))}
               </span>
-              <span className="roll-ghost">{c}</span>
+              <span className="roll-ghost" data-ch={c} />
             </span>
           );
         })}

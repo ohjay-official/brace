@@ -49,7 +49,7 @@ export function AssetDetail({ symbol }: { symbol: Symbol }) {
           {ASSET_NAMES[symbol]}
         </h1>
         <p className="lede">
-          The {symbol} feed on Solana devnet. The limit below is what the program allows against {symbol} collateral right now.
+          The {symbol} feed on Solana devnet. The limit below is the one Brace's oracle publishes for {symbol} right now. The demo pool takes SOL collateral, so borrows use the SOL limit.
         </p>
         <div className="actions">
           {symbol === "SOL" ? (

@@ -73,7 +73,7 @@ export default function Home() {
           <header className="shead">
             <p className="shead-k">Three rules in the program</p>
             <h2 id="rules-title" className="converge">
-              <span className="cv-a">Bad data can</span> <span className="cv-b">only lower it</span>
+              <span className="cv-a">Stale data can</span> <span className="cv-b">only lower it</span>
             </h2>
           </header>
           <ol className="rules">
@@ -91,7 +91,7 @@ export default function Home() {
             <li>
               <span className="r-n">R3</span>
               <h3>Odds never liquidate</h3>
-              <p>The odds only set how much you can borrow. Liquidation uses the fixed threshold in the config and nothing else.</p>
+              <p>The odds only set how much you can borrow. Liquidation uses the 80% threshold set in the config and nothing else.</p>
             </li>
           </ol>
         </div>

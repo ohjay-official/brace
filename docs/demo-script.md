@@ -32,7 +32,7 @@
 3. Back in Phantom, check that the SOL shows up while Testnet mode is on.
 
 **Live check (5 minutes before recording)**
-- Open `https://braced.vercel.app`. All five rows (SOL, BTC, ETH, XRP, ZEC) should say updated seconds ago.
+- Open `https://braced.vercel.app`. All five rows (SOL, BTC, ETH, XRP, ZEC) should show an age in seconds (for example "11s ago").
 - If the board says "Live limits are not loading", tap **Try again**. If it is still down after 5 minutes, see docs/runbook.md before recording.
 
 **Rehearse once** with the stopwatch, reading the lines out loud. Then record for real.
@@ -45,7 +45,7 @@ Record three clips, then join them. One mistake costs one clip, not the whole vi
 |---|---|---|---|
 | A | 1 to 3 | 0:42 | Chrome |
 | B | 4 to 6 | 0:58 | Phantom's in-app browser |
-| C | 7 to 9 | 0:50 | Phantom's in-app browser, then Chrome |
+| C | 7 to 9 | 0:57 | Phantom's in-app browser, then Chrome |
 
 Join the clips in Samsung Gallery's built-in video editor (Studio). Trim dead air at the start and end of each clip so the total lands on 2:37. The menu names can differ between One UI versions; any phone video editor that joins clips works.
 
@@ -57,7 +57,7 @@ Total: 2:37. Times are cumulative.
 
 **Shot 1 · 0:00 to 0:12 (12 s) · the board**
 - URL: `https://braced.vercel.app`
-- On screen: the risk board, five assets, "updated seconds ago".
+- On screen: the risk board, five assets, each showing an age in seconds.
 - Tap: nothing. Let it sit.
 - Voiceover: "lending apps set borrowing limits by vote, and those limits rarely change. brace sets them every minute, from gemini prediction markets, onchain on solana."
 
@@ -108,7 +108,7 @@ Total: 2:37. Times are cumulative.
 - On screen: the limit chart over time and the list of blocked and allowed borrows.
 - Voiceover, part 1 (about 10 s): "quicknode streams records every limit update and every borrow, including the failed ones. that history is how we check the oracle."
 - Voiceover, part 2 (about 10 s), pick one:
-  - With the verified number: "over 8303 one-hour forecasts, prices stayed inside the one-sigma band 79.47 percent of the time. sixty-eight was expected, so the limits run cautious."
+  - With the verified number (about 9 s): "prices stayed inside the one-sigma band 79.5 percent of the time, where 68 would be perfect. the limits run cautious."
   - Without a number: "next, we are scoring these limits against what prices actually did."
 - Use these verified 1-hour 1σ figures, from an independent recompute of live `/history` at 04:22 Africa/Lagos on 19 Nov 2026: overall 79.47% of 8,303; per asset SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 2σ overall is 97.21%. Do not substitute placeholders or a later unreviewed range.
 - Use the 1-hour numbers only. The 24-hour hit rates (many at 100%) come from overlapping windows over about two days, so they don't prove anything yet. Never quote them.
@@ -118,7 +118,7 @@ Total: 2:37. Times are cumulative.
 **Shot 9 · 2:18 to 2:37 (19 s) · close**
 - URL: `https://github.com/ohjay-official/brace` (open in Chrome).
 - On screen: the README top, with the live app link.
-- Voiceover: "limits never pass the governance cap, bad data only lowers them, and odds never liquidate anyone. it is open source and live on devnet. devnet because it is not audited yet: real loans wait for an audit and gemini's ok on onchain data. the link is below. this is brace."
+- Voiceover (40 words, about 17 s): "limits never pass the cap, stale data only lowers them, and odds never liquidate anyone. it is open source and on devnet, because it is not audited yet: real loans wait for an audit and gemini's ok. this is brace."
 - Do not say "odds can only tighten a limit": a calmer market lets a new confident post raise the limit, up to the 75% cap (`docs/reviews.md` Pass 5 F7).
 
 ## 4. Fallbacks

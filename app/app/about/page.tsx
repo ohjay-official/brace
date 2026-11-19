@@ -77,7 +77,7 @@ export default function AboutPage() {
             <p>
               Lending markets set loan to value limits by governance vote and change them rarely. When volatility jumps, the limits are
               still the calm-week numbers. Implied volatility feeds from options markets mostly cover majors, and collateral like ZEC has no
-              crypto options market at all.
+              options on Deribit, the largest crypto options venue.
             </p>
           </section>
 
@@ -109,7 +109,7 @@ export default function AboutPage() {
             <p>
               Max LTV is the lower of the governance max and a volatility-adjusted limit. Stale or low confidence data never loosens
               anything: Brace keeps the last valid limit and steps it down toward a conservative floor until fresh data arrives. A demo
-              pool checks borrows and withdrawals against that limit; liquidation uses a fixed threshold only.
+              pool checks borrows and withdrawals against that limit; liquidation uses the 80% threshold in the config only.
             </p>
             <ProofLog />
           </section>

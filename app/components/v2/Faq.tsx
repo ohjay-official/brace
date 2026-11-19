@@ -16,15 +16,15 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How is implied volatility computed onchain?",
-    a: 'Each contract "price at or above K at expiry" trades at a probability. Under a lognormal model, the probit of that probability falls on a straight line in ln(K), with a slope of minus 1 over σ√T. The program fits that line by least squares from the raw quotes, which gives σ√T and the implied median. The relayer never posts a volatility number, so it cannot hand the program a convenient one.',
+    a: 'Each contract "price at or above K at expiry" trades at a probability. Under a lognormal model, the probit of that probability falls on a straight line in ln(K), with a slope of minus 1 over σ√T. The program fits that line by least squares from the raw quotes, which gives σ√T and the implied median. The relayer never posts a volatility number: the program computes it from the quotes. The quotes themselves come from a trusted relayer (see Known Limitations in the README).',
   },
   {
     q: "How is the borrow limit set?",
-    a: "The fit is scaled to the move it implies over 24 hours, s. The limit is 80% × (1 − 3s), clamped between 30% and the 75% governance cap. The market can tighten a limit, but never loosen it past what governance set. Liquidation uses the fixed threshold in the config, never the odds.",
+    a: "The fit is scaled to the move it implies over 24 hours, s. The limit is 80% × (1 − 3s), clamped between 30% and the 75% governance cap. The market moves a limit inside that band and never above the cap governance set. Liquidation uses the 80% threshold set in the config, never the odds.",
   },
   {
     q: "What happens when the feed goes stale?",
-    a: "Thin, stale or inconsistent data never loosens a limit. The program holds the last limit for 5 minutes, then steps it down 2.5 points every 5 minutes, to a 50% floor or the last limit if that is lower. After an hour with no fresh data, borrowing and liquidation pause.",
+    a: "Thin, stale or inconsistent data never loosens a limit. The program holds the last limit for 5 minutes, then steps it down 2.5 points every 5 minutes, to a 50% floor or the last limit if that is lower. After an hour without a confident post, borrowing, withdrawing with debt and liquidation pause.",
   },
   {
     q: "What does error 6005, RiskTightened, mean?",

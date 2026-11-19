@@ -10,8 +10,8 @@ export const RELAY_MAX_AGE_SECS = 8 * 86_400;
 /** Calls per IP per minute per function instance. Pages poll every 30 s to 2 min. */
 export const RELAY_RATE_MAX = 120;
 export const RELAY_RATE_WINDOW_MS = 60_000;
-/** Browsers keep it a minute; the CDN keeps it 2 minutes and serves it stale up to 10 more while it refetches. */
-export const RELAY_CACHE = "public, max-age=60, s-maxage=120, stale-while-revalidate=600";
+/** Browsers keep it a minute; the CDN keeps it 5 minutes (one since bucket) and serves it stale up to an hour while it refetches. */
+export const RELAY_CACHE = "public, max-age=60, s-maxage=300, stale-while-revalidate=3600";
 export const RELAY_TIMEOUT_MS = 10_000;
 export const RELAY_ASSETS = ["SOL", "BTC", "ETH", "XRP", "ZEC"] as const;
 
