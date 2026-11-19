@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, ChevronDown, Moon, Sun } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Moon, Sun } from "lucide-react";
 import { PROGRAM_ID, REPO_URL, explorerAddress, feedEffectiveLtvBps, feedStatus } from "@/lib/brace";
 import { pct1 } from "@/lib/chart";
 import { RELAYER_URL } from "@/lib/history";
@@ -116,52 +116,6 @@ const NAV = [
   },
 ];
 const DOCS_URL = `${REPO_URL}/tree/main/docs`;
-
-/** Outside links. "main" shows inline from 1024px, "sec" from 1280px; below that they sit under More. */
-const EXT = [
-  { href: REPO_URL, label: "GitHub", tier: "main" },
-  { href: DOCS_URL, label: "Docs", tier: "sec" },
-  { href: explorerAddress(PROGRAM_ID.toBase58()), label: "Explorer", tier: "sec" },
-] as const;
-
-/** Tablet widths: the outside links that do not fit inline, in a small dropdown. */
-function MoreLinks() {
-  const ref = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
-    const onPtr = (e: PointerEvent) => {
-      if (ref.current?.open && !ref.current.contains(e.target as Node)) ref.current.open = false;
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && ref.current?.open) {
-        ref.current.open = false;
-        ref.current.querySelector("summary")?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", onPtr);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onPtr);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, []);
-  return (
-    <details className="nav-more" ref={ref}>
-      <summary>
-        More <ChevronDown size={14} aria-hidden />
-      </summary>
-      <ul>
-        {EXT.map((l) => (
-          <li key={l.label} className={`nav-more-${l.tier}`}>
-            <a href={l.href} target="_blank" rel="noopener noreferrer">
-              {l.label} <ArrowUpRight size={14} aria-hidden />
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </details>
-  );
-}
 
 function isActive(path: string, href: string) {
   if (href.includes("#")) return false;
@@ -336,25 +290,8 @@ export function Header() {
             <span className="brand-word">Brace</span>
             <span className="net">devnet</span>
           </Link>
-          <nav className="nav-links" aria-label="Main">
-            {NAV.map((l) => (
-              <Link key={l.href} href={l.href} aria-current={isActive(path, l.href) ? "page" : undefined}>
-                {l.label}
-              </Link>
-            ))}
-            {EXT.map((l) => (
-              <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer" className={`nav-ext nav-ext-${l.tier}`}>
-                {l.label} <ArrowUpRight size={14} aria-hidden />
-                <span className="sr-only"> (opens in a new tab)</span>
-              </a>
-            ))}
-          </nav>
           <div className="nav-right">
-            <MoreLinks />
             <NavReading />
-            <span className="nav-theme">
-              <ThemeSwitch id="theme-header" />
-            </span>
             <MenuSheet path={path} />
           </div>
         </div>

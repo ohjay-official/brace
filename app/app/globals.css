@@ -3840,7 +3840,7 @@ code,
 }
 
 /* Tablet and phone */
-@media (max-width: 1080px) {
+@media (max-width: 1023px) {
   .rules {
     grid-template-columns: 1fr 1fr;
   }
@@ -6610,8 +6610,8 @@ body:has(.sheet.is-open)::after {
 
 /* ==== Header v2: every link inline on tablets ====
    Below 768px: the menu button only. From 768px: every page link inline and no menu button;
-   GitHub, Docs and Explorer sit under a small More until they fit (GitHub inline from 1024px,
-   all of them from 1280px). The SOL pill shows from 1024px, the devnet tag from 1180px. */
+   GitHub, Docs and Explorer sit under a small More from 768 to 1023px. From 1024px (a 13" iPad
+   in portrait) it is the full desktop header: every link, the SOL pill, the devnet tag, no More. */
 .nav-more {
   display: none;
   position: relative;
@@ -6738,23 +6738,7 @@ body:has(.sheet.is-open)::after {
     left: 9px;
     right: 9px;
   }
-  .nav-ext.nav-ext-main {
-    display: inline-flex !important;
-    gap: 4px;
-  }
-  .nav-more-main {
-    display: none;
-  }
-  .nav-reading {
-    display: inline-flex;
-  }
-}
-@media (min-width: 1180px) {
-  .brand .net {
-    display: inline;
-  }
-}
-@media (min-width: 1280px) {
+  .nav-ext.nav-ext-main,
   .nav-ext.nav-ext-sec {
     display: inline-flex !important;
     gap: 4px;
@@ -6762,4 +6746,61 @@ body:has(.sheet.is-open)::after {
   .nav-more {
     display: none;
   }
+  .nav-reading {
+    display: inline-flex;
+  }
+  .brand .net {
+    display: inline;
+  }
+}
+/* 1024-1279 (13" iPad portrait, small laptops): the full desktop header, packed tighter. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .hd {
+    gap: 8px;
+  }
+  .site-header .nav-links a {
+    padding: 0 6px;
+    font-size: 13px;
+  }
+  .site-header .nav-links a[aria-current="page"]::after {
+    left: 6px;
+    right: 6px;
+  }
+  .nav-ext svg {
+    width: 12px;
+    height: 12px;
+  }
+  .nav-reading {
+    padding: 0 8px;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .brand {
+    font-size: 16px;
+  }
+  .brand .net {
+    font-size: 11px;
+    padding-left: 6px;
+  }
+  .theme-sw button {
+    width: 44px;
+  }
+}
+
+/* ==== Header v3: one header at every width ====
+   Logo, devnet tag, SOL pill and the menu button. Every page and link lives in the numbered
+   frosted menu, which opens at every width. No inline links, no More dropdown. */
+.site-header .nav-links,
+.site-header .nav-more,
+.site-header .nav-theme {
+  display: none !important;
+}
+.menu {
+  display: block !important;
+}
+.site-header .nav-reading {
+  display: inline-flex !important;
+}
+.site-header .brand .net {
+  display: inline !important;
 }
