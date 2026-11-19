@@ -6530,3 +6530,80 @@ body:has(.sheet.is-open)::after {
     backdrop-filter: blur(24px) saturate(140%);
   }
 }
+
+/* ==== Apple-style material (v3) ====
+   Translucent glass: colour and light from the page glow through, blurred so no word can be read.
+   The open menu stacks two blurs: a 64px page backdrop, then the panel's own 48px blur.
+   While the menu is open the header drops its own backdrop-filter so it is not the panel's backdrop root.
+   Without backdrop-filter every surface stays solid (rules above). */
+:root {
+  --mat-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --mat-sheen: linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04) 45%, rgba(255, 255, 255, 0) 70%);
+  --mat-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+:root[data-theme="dark"] {
+  --mat-sheen: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02) 45%, rgba(255, 255, 255, 0) 70%);
+  --mat-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .sheet,
+  :root[data-theme="dark"] .sheet,
+  :root:not([data-theme="light"]) .sheet {
+    background: var(--mat-grain), var(--mat-sheen), color-mix(in srgb, var(--card-solid) 55%, transparent);
+    -webkit-backdrop-filter: blur(48px) saturate(180%) brightness(1.06);
+    backdrop-filter: blur(48px) saturate(180%) brightness(1.06);
+    box-shadow: var(--mat-edge), 0 24px 60px -20px rgba(20, 10, 60, 0.35);
+  }
+  .site-header.is-scrolled,
+  :root[data-theme="dark"] .site-header.is-scrolled {
+    background: var(--mat-sheen), color-mix(in srgb, var(--page) 60%, transparent);
+    -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+    backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.14);
+  }
+  .site-header:has(.sheet.is-open),
+  :root[data-theme="dark"] .site-header:has(.sheet.is-open) {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .burger,
+  :root[data-theme="dark"] .burger,
+  .sheet-ext a,
+  .sheet .theme-sw {
+    background: var(--mat-sheen), color-mix(in srgb, var(--card-solid) 50%, transparent);
+    -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+    backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+    box-shadow: var(--mat-edge);
+  }
+  .glass,
+  .card-lit {
+    background: var(--mat-sheen), color-mix(in srgb, var(--card-solid) 62%, transparent);
+    -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+    backdrop-filter: blur(40px) saturate(180%) brightness(1.05);
+  }
+  body:has(.sheet.is-open)::after {
+    background: color-mix(in srgb, var(--page) 35%, transparent);
+    -webkit-backdrop-filter: blur(64px) saturate(180%) brightness(1.05);
+    backdrop-filter: blur(64px) saturate(180%) brightness(1.05);
+  }
+}
+/* The page itself blurs under the open menu, so the stack is page blur, backdrop tint, panel blur. */
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  body:has(.sheet.is-open) main,
+  body:has(.sheet.is-open) footer {
+    filter: blur(28px) saturate(170%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  main, footer { transition: filter 0.25s ease; }
+}
+/* Dimmest text on dark glass: lifted so it keeps 4.5:1 over the bluest glow. */
+:root[data-theme="dark"] .sheet {
+  --text-3: #c2bce3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sheet {
+    --text-3: #c2bce3;
+  }
+}
