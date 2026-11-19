@@ -11,7 +11,8 @@ import { useEffect } from "react";
 export function Scenes() {
   useEffect(() => {
     const root = document.documentElement;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || typeof IntersectionObserver === "undefined") {
+    // Automated browsers (screenshot bots, AI screeners) get every scene finished, so full-page captures are never blank.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || typeof IntersectionObserver === "undefined" || navigator.webdriver) {
       root.classList.remove("motion");
       return;
     }

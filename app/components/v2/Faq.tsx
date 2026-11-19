@@ -20,7 +20,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "How is the borrow limit set?",
-    a: "The fit is scaled to the move it implies over 24 hours, s. The limit is 80% × (1 − 3s), clamped between 30% and the 75% governance cap. The market moves a limit inside that band and never above the cap governance set. Liquidation uses the 80% threshold set in the config, never the odds.",
+    a: "The fit is scaled to the move it implies over 24 hours, s. The limit is 80% × (1 − 3s), clamped between 30% and the 75% admin-set cap. The market moves a limit inside that band and never above the 75% cap the admin set. Liquidation uses the 80% threshold set in the config, never the odds.",
   },
   {
     q: "What happens when the feed goes stale?",

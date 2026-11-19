@@ -45,10 +45,18 @@ for a in ["SOL", "BTC", "ETH", "XRP", "ZEC"]:
     age = f.get("ageSecs") if f else None
     print(f"{a}: age {age}s")
     if age is None or age > max_age: bad.append(f"{a} stale ({age}s)")
-print("lastRun", h.get("lastRun"))
+if h.get("lastRun"): print("lastRun", h.get("lastRun"))
+else: print("lastRun: not known to this relayer instance (onchain feed ages above are what count)")
+if h.get("storeError"):
+    print("WARN: history store is paused: " + str(h["storeError"])[:120] + " (Cloudflare D1 free daily read limit, resets 00:00 UTC). Onchain limits are unaffected; /history and /actions answer 503 until then.")
 if bad:
     print("FAIL: " + "; ".join(bad)); sys.exit(1)
 print("relayer healthy")
-'
+if h.get("storeError"): sys.exit(3)
+' && HIST=ok || { rc=$?; [[ $rc == 3 ]] && HIST=paused || exit $rc; }
 echo
-echo "verify: all checks passed"
+if [[ "${HIST:-ok}" == "paused" ]]; then
+  echo "verify: onchain and app checks passed; history store paused for today (see WARN above)"
+else
+  echo "verify: all checks passed"
+fi

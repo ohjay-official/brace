@@ -8,7 +8,7 @@ Plain words, no slides needed for the short version. Every number here is checke
 >
 > Brace fixes that with prediction markets. Gemini lists markets like "will SOL be above 80 dollars tonight", at many prices. Together those odds tell you how far traders expect the price to move. Every minute, Brace posts those odds to Solana, and our program turns them into a borrowing limit: more expected movement, lower limit.
 >
-> The math runs onchain from raw quotes, so anyone can check the number. Limits never go above the 75% governance cap, stale or thin data only ever lowers them, and odds never liquidate anyone.
+> The math runs onchain from raw quotes, so anyone can check the number. Limits never go above the 75% admin-set cap, stale or thin data only ever lowers them, and odds never liquidate anyone.
 >
 > It is live on devnet right now for SOL, Bitcoin, Ether, XRP and Zcash. Try to borrow over the limit and Solana itself rejects the transaction. That is Brace.
 
@@ -52,7 +52,7 @@ Posting quotes every minute and doing the fit onchain has to be cheap. A SOL pos
 The Worker gives Gemini 8 seconds. If it fails, nothing is posted and the program's staleness rule takes over: The program holds the last good limit for 5 minutes, then lowers it 2.5 points every 5 minutes, never below 50% (or the last limit if lower). After an hour without a confident post, borrowing and liquidation pause. A missing feed can never make borrowing easier.
 
 **Can someone manipulate the odds to borrow more?**
-A manipulated ladder can raise a limit at most to the 75% governance cap; today only BTC sits there. Because the relayer also posts the spot price, it is trusted. Pushing the market down only tightens limits. That can block new borrows and withdrawals, but it cannot liquidate anyone, because odds never liquidate. Each post also needs several two-sided quotes with tight spreads, an expiry between 15 minutes and 72 hours, and spot within 3% of the ladder's implied median. Known gap: the relayer is trusted to post real quotes. Signed or multi-source quotes are the fix, and we say so in the README.
+A manipulated ladder can raise a limit at most to the 75% admin-set cap; today only BTC sits there. Because the relayer also posts the spot price, it is trusted. Pushing the market down only tightens limits. That can block new borrows and withdrawals, but it cannot liquidate anyone, because odds never liquidate. Each post also needs several two-sided quotes with tight spreads, an expiry between 15 minutes and 72 hours, and spot within 3% of the ladder's implied median. Known gap: the relayer is trusted to post real quotes. Signed or multi-source quotes are the fix, and we say so in the README.
 
 **What is the business model?**
 TBD, and we will not pretend otherwise. The obvious path is charging lending protocols or risk curators for the feed, per asset or per call, once it has a measured track record. Today it is an open-source devnet demo with no revenue and no users beyond our testing.
@@ -61,7 +61,7 @@ TBD, and we will not pretend otherwise. The obvious path is charging lending pro
 No. It is a risk limit with a minimal pool to prove enforcement: SOL collateral, a test USD token with no value, 0% interest, full-debt liquidation only. The limit is the product.
 
 **Did you build this during the hackathon? How much was AI?**
-Yes. The first commit is Nov 15, 23:14 Lagos time, after the Nov 12 kickoff. Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions. Every change had to pass its tests: 52 Rust tests including a 3,000-action fuzz run, 117 Worker tests, 105 app tests, and five security review passes.
+Yes. The first commit is Nov 15, 23:14 Lagos time, after the Nov 12 kickoff. Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions. Every change had to pass its tests: 52 Rust tests including a 3,000-action fuzz run, 117 Worker tests, 108 app tests, and six review passes by four separate AI reviewer sessions (not a professional audit).
 
 **Why does ZEC get a lower limit?**
 Because Gemini traders price bigger moves for it. Across Nov 17 its implied volatility ranged from 71% to 262% a year, against 27% to 66% for Bitcoin, so its limit moved between about 47% and 71% while Bitcoin stayed between about 72% and the 75% cap.
@@ -78,7 +78,7 @@ Because Gemini traders price bigger moves for it. Across Nov 17 its implied vola
 | BTC limit range | 71.8% to 75.0% (cap) | Same pull |
 | Compute for one SOL post | 40,674 units | README Proof, Explorer |
 | Relayer cost | About 0.01 devnet SOL a day | Balance change 12:24 to 15:37 WAT, Nov 17 |
-| Tests | 52 Rust, 117 Worker, 105 app | `scripts/verify.sh` on main, Nov 19 |
+| Tests | 52 Rust, 117 Worker, 108 app | `scripts/verify.sh` on main, Nov 19 |
 | Borrow attempts recorded through Streams | 5 actions, 2 rejected onchain | `/actions`, Nov 17 |
 | Borrows onchain | 10 borrows, 5 rejected onchain | Devnet RPC, Nov 19 |
 | Accuracy (preliminary) | 79.5% inside 1σ, 97.2% inside 2σ, 8,303 one-hour forecasts | Alchin's tracker on `/history`, Nov 17 to 19 |

@@ -30,7 +30,7 @@ export function AssetDetail({ symbol }: { symbol: Symbol }) {
           ["Quotes used in the fit", `${f.points}`],
           ["Last confident update", f.hasValid ? relTime(m.now - Number(f.lastValidAt)) : "never"],
           ["Max limit, last confident", pct1(f.maxLtvBps)],
-          ["Governance cap", pct1(m.cap)],
+          ["Admin-set cap", pct1(m.cap)],
           ["Liquidation threshold", pct1(m.liq)],
         ]
       : [];

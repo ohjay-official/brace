@@ -8,7 +8,7 @@
 
 **Gemini's prediction markets, turned into an onchain volatility oracle for Solana lending.**
 
-Lending markets set loan-to-value limits by governance vote and rarely change them, so limits are still the calm-week numbers when volatility arrives. Brace reads Gemini's live "price X or above" ladders, computes implied volatility onchain on Solana, and tightens borrowing limits before the move. Limits never go above the 75% governance cap, stale data only ever lowers them, and odds never liquidate anyone.
+Lending markets set loan-to-value limits by governance vote and rarely change them, so limits are still the calm-week numbers when volatility arrives. Brace reads Gemini's live "price X or above" ladders, computes implied volatility onchain on Solana, and tightens borrowing limits before the move. Limits never go above the 75% admin-set cap, stale data only ever lowers them, and odds never liquidate anyone.
 
 | What | Steps, time and what it needs |
 |---|---|
@@ -53,7 +53,7 @@ Measured with Playwright Chromium at a 390 px phone viewport, cold cache, from o
 - **The math works on real Gemini data.** A captured SOL ladder used as a test fixture fits onchain to 82.7% implied volatility and a 69.6% limit (`sigma_bps` 8272, `max_ltv_bps` 6960), matching an independent float reference ([`programs/brace/tests/oracle.rs`](programs/brace/tests/oracle.rs), [`src/math.rs`](programs/brace/src/math.rs) unit tests).
 - **The deployed program is this repo's code.** The program dumped from devnet (`solana program dump -u devnet Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC deployed.so`) has the same SHA-256 as a fresh `cargo build-sbf` of `programs/brace` on main: `5ab936eca3384bd94cff3f3c6605e17832f6667a82571b60f50730091fcf2e81`, checked twice on Nov 19, 2026 (program source last changed in `3ee7c0e`).
 - **Reviewed in six passes** by four separate AI reviewer sessions (not a professional audit): no critical or high findings; fixed mediums each have a reproducing test, and the open ones are listed in Known Limitations ([`docs/reviews.md`](docs/reviews.md)).
-- **Accuracy (Alchin's tracker, [`tracker/`](tracker/)):** across 8,303 one hour forecasts posted between Nov 17 04:59 and Nov 19 03:22 Lagos, the price stayed inside Brace's 1σ band 79.47% of the time and inside 2σ 97.21% (a perfectly calibrated band would hold about 68% and 95%). Counting only non overlapping hourly forecasts: 1σ 135/164 (82.32%), 2σ 160/164 (97.56%). So the limits run conservative, which is the safe side for a lender. Per asset 1σ: SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 24 hour results are preliminary because of feed gaps; BTC was under the target at 24h on this sample. These check the 1 hour 1σ and 2σ bands; the limit itself uses a 3σ 24 hour move, which needs a longer record to test. A reproducible snapshot is committed in [`docs/accuracy/2026-11-19/`](docs/accuracy/2026-11-19/): the same tracker on rows through Nov 19 06:55 Lagos gives 1σ 77.65% and 2σ 96.33% across 9,017 one hour forecasts.
+- **Accuracy (Alchin's tracker, [`tracker/`](tracker/)):** across 8,303 one hour forecasts posted between Nov 17 04:59 and Nov 19 03:22 Lagos, the price stayed inside Brace's 1σ band 79.47% of the time and inside 2σ 97.21% (a perfectly calibrated band would hold about 68% and 95%). Counting only non overlapping hourly forecasts: 1σ 135/164 (82.32%), 2σ 160/164 (97.56%). So the limits run conservative, which is the safe side for a lender. Per asset 1σ: SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 24 hour results are preliminary because of feed gaps; BTC was under the target at 24h on this sample. These check the 1 hour 1σ and 2σ bands; the limit itself uses a 3σ 24 hour move, which needs a longer record to test. A reproducible snapshot is committed in [`docs/accuracy/2026-11-19/`](docs/accuracy/2026-11-19/): the same tracker on rows through Nov 19 06:56 Lagos gives 1σ 77.65% and 2σ 96.33% across 9,017 one hour forecasts.
 
 ## What's New Here
 
@@ -107,7 +107,7 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 | Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 117/117 worker tests passed on main on Nov 19, 2026. The live Worker runs an earlier build: the forged-history fix (audit pass 6, M3) and the backup RPC (PR #4) are on main and deploy next. |
 | Keyed backup RPC for the relayer (PR #4) | In code on main and covered by the worker tests; not yet deployed to the live Worker. |
 | Streams sink and `/history` API | Live. `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
-| Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 105/105 app tests passed on main on Nov 19, 2026. The board and History read the relayer through the app's cached `/api/history` and `/api/actions` routes. |
+| Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 108/108 app tests passed on main on Nov 19, 2026. The board and History read the relayer through the app's cached `/api/history` and `/api/actions` routes. |
 | Accuracy tracker (Python, [`tracker/`](tracker/)) | Measured by Alchin from a live `/history` pull at 04:22 Lagos, Nov 19: 1σ band held 79.47% and 2σ 97.21% across 8,303 one hour forecasts (see Proof It's Real). |
 
 ## More Ways to Test
@@ -144,7 +144,7 @@ cargo build-sbf --manifest-path programs/brace/Cargo.toml && cargo test -p brace
 
 Use `cargo build-sbf`, not `anchor build`, in a fresh clone: `anchor build` creates a new program keypair and rewrites `declare_id`, and then the program id test fails on purpose.
 
-Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 117 worker tests and 105 app tests, re-run on main on Nov 19, 2026.
+Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 117 worker tests and 108 app tests, re-run on main on Nov 19, 2026.
 
 </details>
 
@@ -195,7 +195,7 @@ Each Gemini contract "price ≥ K at expiry" trades at a probability. Under a lo
 
 1. Keep quotes with both sides, spread ≤ 15 cents, mid between 3% and 97%; skip strikes more than 15% from the middle strike.
 2. Least-squares fit gives σ√T and the implied median. The strikes must span at least 0.5%, and σ must be at least 5%.
-3. Move over 24 hours: s = σ√T·√(24h/T). Limit = 80% × (1 − 3s), clamped between 30% and the 75% governance cap.
+3. Move over 24 hours: s = σ√T·√(24h/T). Limit = 80% × (1 − 3s), clamped between 30% and the 75% admin-set cap.
 4. Stale data: hold the last limit for 5 minutes, then step down 2.5 points every 5 minutes, never below 50% (or the last limit if lower). After an hour, borrowing and liquidation pause.
 
 </details>
@@ -203,20 +203,21 @@ Each Gemini contract "price ≥ K at expiry" trades at a probability. Under a lo
 ### Economic Design and Risk Assumptions
 
 - **Collateral and debt.** Users deposit devnet SOL and borrow a test USD token (6 decimals) minted by the pool. Collateral is valued at Gemini's SOL spot price. Interest is 0%: this demonstrates the risk limit, not a full market.
-- **Borrow limit.** `limit = 80% x (1 - 3 x s)`, where `s` is the 24-hour move implied by Gemini's ladder. It is clamped between 30% and a 75% governance cap, so the market moves a limit only inside that band and never above the cap governance set.
+- **Borrow limit.** `limit = 80% x (1 - 3 x s)`, where `s` is the 24-hour move implied by Gemini's ladder. It is clamped between 30% and a 75% admin-set cap, so the market moves a limit only inside that band and never above the 75% cap the admin set.
 - **Liquidation.** At 80% LTV, a threshold set in the config (an admin parameter), never driven by odds. A liquidator repays the full debt and receives SOL worth the debt plus a 5% bonus, capped at the position's collateral.
 - **Assumptions.** Price at expiry is roughly lognormal, so the ladder's probabilities fit a straight line after a probit transform. Three 24-hour standard deviations is the safety margin. Gemini quotes are thin, so a post counts only with at least 3 two-sided quotes, spreads of 15 cents or less, expiry between 15 minutes and 72 hours, and spot within 3% of the ladder's implied median.
 - **When the assumptions fail.** Unconfident or stale data holds the last limit for 5 minutes, then steps it down 2.5 points every 5 minutes to a 50% floor (or the last limit, if lower), and pauses borrowing and liquidation after an hour. The relayer is trusted to post real quotes (see Known Limitations).
 
 ## Security
 
-Reviewed in six passes (correctness, access control, financial logic, adversarial cases, an independent final pass, and a fresh audit on Nov 19 that reproduced each finding with a test). No critical or high findings. Every medium finding from passes 1 to 5 was fixed with a test that reproduces it, except the `initialize` front run, which the deploy script handles. Pass 6 found three mediums: the forged-history one is fixed in the Worker, and the two about liquidation using an old spot price are accepted for now and listed below. Accepted low findings are listed in `docs/reviews.md`. Full log: [`docs/reviews.md`](docs/reviews.md).
+Reviewed in six passes (correctness, access control, financial logic, adversarial cases, an independent final pass, and a fresh audit on Nov 19 that reproduced each finding with a test). No critical or high findings. Every medium finding from passes 1 to 5 was fixed with a test that reproduces it, except the `initialize` front run, which the deploy script handles. Pass 6 found three mediums: the forged-history one is fixed on main and reaches the live Worker on its next deploy, and the two about liquidation using an old spot price are accepted for now and listed below. Accepted low findings are listed in `docs/reviews.md`. Full log: [`docs/reviews.md`](docs/reviews.md).
 
 ### Known Limitations
 
 - **The relayer is trusted** for quotes and the spot price. Mitigations: spot only moves on confident posts, must sit within 3% of the ladder's implied median, and goes stale after an hour.
 - **`initialize` can be front-run** between deploy and setup. Deploy, initialize and pool setup run back to back from one script, and the stored admin is checked afterwards.
 - **Liquidation repays the full debt** only. Test USD has no value.
+- **One admin key, no timelock.** The admin (`FncbMM…SvdM` on devnet) can change the 75% cap, the 80% liquidation threshold and the other parameters at any time with `set_params`. Odds never trigger a liquidation, but a lower threshold set by the admin would. Production needs a multisig and a timelock.
 - **Collateral can be priced with an old spot for up to an hour.** Spot only updates on confident posts. In a crash where Gemini's ladder lags spot by more than 3%, liquidation runs on the pre-crash price; after a dip, a healthy position can be liquidated on the old dip price. Both last at most an hour, until `StalePrice`. The fix is a separate, shorter freshness clock for spot (audit pass 6, M1 and M2).
 - **Rounding can loosen a limit slightly.** Midpoints snap to 50 bps steps before the fit, so on steep or narrow ladders the limit can be up to about 1.5 points looser than a floating point fit, still capped at 75%.
 - **Liquidation pauses on a stale price.** In a fast crash the fits can go non-confident, so spot stops updating; an hour after the last confident post, `liquidate` fails with `StalePrice` and positions can build bad debt. That is the cost of failing safe.

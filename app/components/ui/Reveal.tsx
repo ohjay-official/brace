@@ -9,7 +9,7 @@ import { useEffect } from "react";
  */
 export function RevealOnScroll() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.webdriver) return;
     if (typeof IntersectionObserver === "undefined") return;
     const els = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]:not(.rv-done)"));
     const below = els.filter((el) => el.getBoundingClientRect().top > window.innerHeight * 0.92);

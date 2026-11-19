@@ -32,7 +32,7 @@ function Trace({ pts, loading, since, until, lo, hi, cap, sym }: { pts: TracePoi
   if (!pts || pts.length < 2) {
     return (
       <span ref={ref} className="ch-trace is-empty">
-        <span>{loading ? "reading 24 hours of posts" : pts === undefined ? "24h trace returns when the relayer is back" : "not enough posts in 24h"}</span>
+        <span>{loading ? "reading 24 hours of posts" : pts === undefined ? "history store paused for today; the limit above is live" : "not enough posts in 24h"}</span>
       </span>
     );
   }

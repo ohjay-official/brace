@@ -84,7 +84,7 @@ Durability and funds:
 Pass 5 F3–F7 remain accepted risks (see above). They were not changed in this prep.
 
 
-## Pass 6: independent audit, cold judge and claims audit (Claude, Nov 19, 10:10 to 12:30 Lagos)
+## Pass 6: independent audit, cold judge and claims audit (Claude, Nov 19, 10:10 to 11:50 Lagos)
 
 Three fresh reviewer sessions that had not seen the build: a strict security audit of the program, Worker and app (findings reproduced with tests in a scratch clone), a cold judge that followed only the README, and a line-by-line claims audit of the README, Devpost draft, pitch, demo script and every live page.
 

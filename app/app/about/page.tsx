@@ -107,7 +107,7 @@ export default function AboutPage() {
           <section id="limit" data-reveal>
             <h2 className="ab-n"><span>04</span> The limit</h2>
             <p>
-              Max LTV is the lower of the governance max and a volatility-adjusted limit. Stale or low confidence data never loosens
+              Max LTV is the lower of the admin-set max and a volatility-adjusted limit. Stale or low confidence data never loosens
               anything: Brace keeps the last valid limit and steps it down toward a conservative floor until fresh data arrives. A demo
               pool checks borrows and withdrawals against that limit; liquidation uses the 80% threshold in the config only.
             </p>

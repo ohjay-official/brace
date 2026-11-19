@@ -111,11 +111,11 @@ Prediction markets used as risk infrastructure, not another betting app. The vol
 - Program (devnet): `Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC` on [Solana Explorer](https://explorer.solana.com/address/Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC?cluster=devnet)
 - [Rejected over-limit borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet), log `brace blocked ltv=7208 limit=6954`
 - [Accepted borrow](https://explorer.solana.com/tx/42EzMtDmmcengifcyTXjLY2BT3K1s8XCdVMEG3usorpbGiYEL5KgFHyBpWm9PyVi3Tymjg34PKqqmeCSQeJgehSf?cluster=devnet), log `ltv=2303 limit=6952`
-- 52 Rust tests (including a 3,000-action fuzz run), 117 Worker tests, 105 app tests; five review passes with no critical or high findings, every medium fixed with a test except the `initialize` front run, which the deploy script handles, and three low findings accepted
+- 52 Rust tests (including a 3,000-action fuzz run), 117 Worker tests, 108 app tests; six review passes with no critical or high findings; every medium from passes 1 to 5 fixed with a test except the `initialize` front run, which the deploy script handles; the forged-history medium from pass 6 fixed in the Worker code; two pass 6 mediums (liquidation can use a spot price up to an hour old) accepted and listed in the README's Known Limitations
 - Accuracy (preliminary): the price landed inside Brace's 1σ band 79.5% of the time and its 2σ band 97.2% over 8,303 one-hour forecasts (Nov 17 to 19); 68% and 95% would be perfect calibration, so limits run conservative
 
 ## Challenges
-Gemini's ladders are thin: quotes exist but trades are rare. That is why every post gets a confidence check and stale data only ever lowers a limit. Fitting a probit curve with integer math inside Solana's compute budget took a lookup table and a careful least-squares fit; a verified SOL post used 40,674 compute units on Nov 17, and each asset's fit runs at about 35,000 to 41,000.
+Gemini's ladders are thin: quotes exist but trades are rare. That is why every post gets a confidence check and stale data only ever lowers a limit. Fitting a probit curve with integer math inside Solana's compute budget took a lookup table and a careful least-squares fit; a verified SOL post used 40,674 compute units on Nov 17, and each asset's fit runs at about 33,000 to 42,000.
 
 ## What's next
 A check_borrow instruction other Solana lending programs can call by CPI, so any market can use the limit. Signed or multi-source quotes so the relayer is no longer trusted. A longer, non-overlapping track record from Alchin's tracker. Then more assets as Gemini lists them, and a mainnet pilot with a real lending market.

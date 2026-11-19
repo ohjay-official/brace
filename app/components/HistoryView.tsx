@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { CopyField } from "@/components/ui/CopyField";
 import { appActionsUrl, appHistoryUrl } from "@/lib/relay-config";
+import { parseSnapshot, snapshotUrl } from "@/lib/snapshot";
+
+/** The borrow list covers a week; the chart covers 24 hours. */
+const ACTIONS_WINDOW_SECS = 7 * 86_400;
 import { HistoryChart } from "@/components/HistoryChart";
 import { fetchWithTimeout, friendlyNetError } from "@/lib/net";
 import {
@@ -30,6 +34,9 @@ export function HistoryView() {
   const [points, setPoints] = useState<ChartPoint[]>([]);
   const [actions, setActions] = useState<ActionRecord[]>([]);
   const [bounds, setBounds] = useState<{ t0: number; t1: number } | null>(null);
+  /** Set when live history is paused and the chart shows the last saved 24 hours instead. */
+  const [snapshotAt, setSnapshotAt] = useState<number | null>(null);
+  const haveLive = useRef(false);
 
   useEffect(() => {
     let alive = true;
@@ -46,14 +53,29 @@ export function HistoryView() {
           return { error: friendlyNetError(e, "the history service") };
         }
       };
-      const [hist, act] = await Promise.all([read(appHistoryUrl("SOL", since)), read(appActionsUrl(since))]);
+      // Borrows: a week, so the verified proof borrows stay listed between demo runs.
+      const [hist, act] = await Promise.all([read(appHistoryUrl("SOL", since)), read(appActionsUrl(now - ACTIONS_WINDOW_SECS))]);
       if (!alive) return;
       if ("body" in hist) {
         setPoints(seriesForChart(parseHistory(hist.body), now));
         setBounds({ t0: since, t1: now });
+        setSnapshotAt(null);
+        haveLive.current = true;
         setStatus("ok");
       } else {
-        setStatus((prev) => (prev === "ok" ? "ok" : "error"));
+        const snap = await read(snapshotUrl("SOL"));
+        const parsed = "body" in snap ? parseSnapshot(snap.body) : null;
+        if (!alive) return;
+        if (haveLive.current) {
+          // Keep showing the last live chart; the next poll will refresh it.
+        } else if (parsed && parsed.rows.length) {
+          setPoints(seriesForChart(parsed.rows, parsed.savedAt));
+          setBounds({ t0: parsed.savedAt - HISTORY_WINDOW_SECS, t1: parsed.savedAt });
+          setSnapshotAt(parsed.savedAt);
+          setStatus("ok");
+        } else {
+          setStatus((prev) => (prev === "ok" ? "ok" : "error"));
+        }
       }
       if ("body" in act) {
         setActions(borrowActions(parseActions(act.body)));
@@ -84,6 +106,15 @@ export function HistoryView() {
 
   return (
     <div className="history">
+      {snapshotAt !== null && (
+        <div className="notice" role="status">
+          <strong>Live history is paused for today</strong>
+          <span className="muted">
+            The relayer&apos;s free history store hit its daily read limit; it resets at 00:00 UTC. The chart shows the last 24 hours recorded before
+            the pause, to {new Date(snapshotAt * 1000).toUTCString().replace(" GMT", " UTC")}. Live limits and borrowing are unaffected.
+          </span>
+        </div>
+      )}
       <HistoryChart points={points} t0={t0} t1={t1} status={chartStatus} />
 
       <section className="history-actions" aria-labelledby="borrows-h">
@@ -115,7 +146,7 @@ export function HistoryView() {
         ) : actStatus === "error" && !formatted.length ? (
           <div className="notice is-error" role="status">
             <strong>Could not load borrows</strong>
-            <span className="muted">{error ?? ""} This page tries again every 30 seconds.</span>
+            <span className="muted">{error ?? ""} If the relayer&apos;s free history store hit its daily read limit, it resets at 00:00 UTC. Limits and borrowing are unaffected. This page tries again every 30 seconds.</span>
           </div>
         ) : formatted.length === 0 ? (
           <div className="notice" role="status">

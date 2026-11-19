@@ -13,6 +13,11 @@ export function _resetRelayMemory() {
   lastGood.clear();
 }
 
+/** The last good answer per asset (or for /actions), whatever its since bucket, so a new bucket still has a fallback. */
+function fallbackKey(path: string): string {
+  return path.replace(/[?&]since=\d+/, "");
+}
+
 export function badRequest(error: string): Response {
   return Response.json({ error }, { status: 400, headers: { "Cache-Control": "no-store" } });
 }
@@ -31,12 +36,13 @@ export async function relay(req: Request, path: string): Promise<Response> {
     if (!res.ok) throw new Error(`relayer ${res.status}`);
     const body = await res.text();
     JSON.parse(body);
-    lastGood.delete(path);
-    lastGood.set(path, body);
+    const key = fallbackKey(path);
+    lastGood.delete(key);
+    lastGood.set(key, body);
     while (lastGood.size > LAST_GOOD_MAX) lastGood.delete(lastGood.keys().next().value as string);
     return new Response(body, { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": RELAY_CACHE } });
   } catch {
-    const stale = lastGood.get(path);
+    const stale = lastGood.get(fallbackKey(path));
     if (stale !== undefined) {
       return new Response(stale, {
         status: 200,

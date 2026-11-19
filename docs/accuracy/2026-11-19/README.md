@@ -1,8 +1,8 @@
 # Accuracy snapshot, Nov 19, 2026
 
-The relayer's `/history` rows for all five assets, saved at 06:56 UTC on Nov 19 (07:56 Lagos), so the accuracy numbers can be rechecked even when the live feed is down.
+The relayer's `/history` rows for all five assets, saved on Nov 19; the last row is from 05:56 UTC (06:56 Lagos), so the accuracy numbers can be rechecked even when the live feed is down.
 
-- `SOL.json.gz` … `ZEC.json.gz`: the raw `/history?asset=X` responses, gzipped (rows from Nov 17 04:59 to Nov 19 06:56 UTC).
+- `SOL.json.gz` … `ZEC.json.gz`: the raw `/history?asset=X` responses, gzipped (rows from Nov 17 03:59 to Nov 19 05:56 UTC).
 - `tracker-report.txt`: the output of Alchin's tracker (`tracker/report.py`) on these files.
 
 ## Reproduce
@@ -24,4 +24,4 @@ python3 /tmp/brace-acc/tracker/analytics.py
 | ZEC | 1,460 / 1,855 (78.7%) | 1,790 / 1,855 (96.5%) |
 | All | 7,002 / 9,017 (77.65%) | 8,686 / 9,017 (96.33%) |
 
-A perfectly calibrated band holds about 68% at 1σ and 95% at 2σ. The headline 79.47% (8,303 forecasts) came from an earlier pull at 03:22 UTC the same day; these two extra hours of data move it to 77.65%. Forecasts are posted every minute, so consecutive one hour windows overlap, and the record covers only about two days.
+A perfectly calibrated band holds about 68% at 1σ and 95% at 2σ. The headline 79.47% (8,303 forecasts) came from an earlier pull at 03:22 UTC the same day; about 2.5 more hours of data move it to 77.65%. Forecasts are posted every minute, so consecutive one hour windows overlap, and the record covers only about two days.

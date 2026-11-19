@@ -116,7 +116,7 @@ export function Worksheet({ symbol }: { symbol: Symbol }) {
   const clampNote = !lp
     ? "No confident fit yet, the limit is held"
     : lp.rawBps > p.govMaxLtvBps
-      ? `Capped at the governance max ${pct1(p.govMaxLtvBps)}`
+      ? `Capped at the admin-set max ${pct1(p.govMaxLtvBps)}`
       : lp.rawBps < p.absFloorLtvBps
         ? `Floored at ${pct1(p.absFloorLtvBps)}`
         : `Inside the cap of ${pct1(p.govMaxLtvBps)}`;
