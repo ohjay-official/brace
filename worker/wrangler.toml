@@ -24,3 +24,13 @@ crons = ["* * * * *"]
 binding = "DB"
 database_name = "brace"
 database_id = "117e5eff-90f6-415e-80cd-5ba350ad47dc"
+
+# Per-IP limit for the public GET endpoints (60 per minute per IP per endpoint, per Cloudflare location).
+# The code also keeps an in-memory window per isolate, so it still limits if this binding is ever removed.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 60
+  period = 60

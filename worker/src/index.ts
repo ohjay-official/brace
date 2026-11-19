@@ -1,4 +1,5 @@
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { checkRate, RATE_MAX, RATE_WINDOW_SECS, type RateLimitBinding } from "./ratelimit.ts";
 import bs58 from "bs58";
 import { ASSETS, type Asset } from "./assets.ts";
 import { checkSinkSecret, readJsonBody, SINK_SECRET_HEADER, verifyQuickNodeSignature } from "./auth.ts";
@@ -32,6 +33,8 @@ export type Env = {
   STREAMS_SINK_SECRET?: string;
   QN_SECURITY_TOKEN?: string;
   DB?: D1Database;
+  /** Workers Rate Limiting binding; optional so tests and local runs work without it. */
+  RATE_LIMITER?: RateLimitBinding;
   /** Test-only in-memory store. */
   __store?: BraceStore;
   /** Test-only fetch for the /health onchain fallback. */
@@ -454,6 +457,16 @@ function corsJson(body: unknown, status = 200, extra: Record<string, string> = {
   return Response.json(body, { status, headers: { ...corsHeaders(), ...extra } });
 }
 
+/** GET endpoints anyone can call. /streams is guarded by its sink secret instead. */
+const LIMITED_PATHS = new Set(["/health", "/preview", "/history", "/actions"]);
+
+/** /preview calls Gemini twice per miss, so one answer per asset is reused for this long per isolate. */
+export const PREVIEW_TTL_SECS = 15;
+const previewMemo = new Map<string, { at: number; body: Record<string, unknown> }>();
+export function clearPreviewMemo(): void {
+  previewMemo.clear();
+}
+
 const d1Stores = new WeakMap<D1Database, D1Store>();
 
 function storeFromEnv(env: Env): BraceStore | null {
@@ -475,6 +488,15 @@ export default {
     if (request.method === "OPTIONS" && (url.pathname === "/history" || url.pathname === "/actions" || url.pathname === "/health")) {
       return new Response(null, { status: 204, headers: corsHeaders() });
     }
+    if (request.method === "GET" && LIMITED_PATHS.has(url.pathname)) {
+      const rate = await checkRate(request, url.pathname, env.RATE_LIMITER);
+      if (!rate.ok) {
+        return corsJson({ error: "rate limited", retryAfter: rate.retryAfter, limit: `${RATE_MAX} per ${RATE_WINDOW_SECS}s per IP` }, 429, {
+          "retry-after": String(rate.retryAfter),
+          "cache-control": "no-store",
+        });
+      }
+    }
     if (url.pathname === "/health") {
       try {
         const onchain = () =>
@@ -489,8 +511,14 @@ export default {
       const symbol = (url.searchParams.get("asset") || "SOL").toUpperCase();
       if (!assetBySymbol(symbol)) return corsJson({ error: unknownAssetMessage(symbol) }, 400);
       try {
-        const body = await previewAsset(symbol, Math.floor(Date.now() / 1000));
-        return corsJson(body);
+        const now = Date.now();
+        const hit = previewMemo.get(symbol);
+        if (hit && now - hit.at < PREVIEW_TTL_SECS * 1000) {
+          return corsJson(hit.body, 200, { "cache-control": `public, max-age=${PREVIEW_TTL_SECS}`, "x-brace-cache": "memo" });
+        }
+        const body = await previewAsset(symbol, Math.floor(now / 1000));
+        previewMemo.set(symbol, { at: now, body });
+        return corsJson(body, 200, { "cache-control": `public, max-age=${PREVIEW_TTL_SECS}`, "x-brace-cache": "gemini" });
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         return corsJson({ error: message }, 502);

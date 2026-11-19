@@ -4,6 +4,7 @@ import "./globals.css";
 import { BoardProvider } from "@/components/BoardProvider";
 import { Footer, Header } from "@/components/Chrome";
 import { SITE_URL } from "@/lib/site";
+import { Analytics } from "@vercel/analytics/next";
 
 const sans = Geist({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-geist-sans", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-geist-mono", display: "swap" });
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main id="main">{children}</main>
           <Footer />
         </BoardProvider>
+        <Analytics />
       </body>
     </html>
   );
