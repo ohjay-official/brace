@@ -4,15 +4,14 @@ import { useEffect, useState } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { CopyField } from "@/components/ui/CopyField";
+import { appActionsUrl, appHistoryUrl } from "@/lib/relay-config";
 import { HistoryChart } from "@/components/HistoryChart";
 import { fetchWithTimeout, friendlyNetError } from "@/lib/net";
 import {
   HISTORY_WINDOW_SECS,
   RELAYER_URL,
-  actionsUrl,
   borrowActions,
   formatBorrowAction,
-  historyUrl,
   parseActions,
   parseHistory,
   seriesForChart,
@@ -40,8 +39,8 @@ export function HistoryView() {
       const since = now - HISTORY_WINDOW_SECS;
       try {
         const [histRes, actRes] = await Promise.all([
-          fetchWithTimeout(historyUrl("SOL", since)),
-          fetchWithTimeout(actionsUrl(since)),
+          fetchWithTimeout(appHistoryUrl("SOL", since)),
+          fetchWithTimeout(appActionsUrl(since)),
         ]);
         if (!histRes.ok || !actRes.ok) throw new HttpError();
         const [histBody, actBody] = await Promise.all([histRes.json(), actRes.json()]);

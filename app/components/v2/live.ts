@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import type { LadderQuote } from "@/app/api/ladder/route";
 import { SYMBOLS, type Symbol } from "@/lib/brace";
-import { RELAYER_URL, historyUrl, parseHistory } from "@/lib/history";
+import { RELAYER_URL, parseHistory } from "@/lib/history";
+import { appHistoryUrl } from "@/lib/relay-config";
 import { fetchWithTimeout } from "@/lib/net";
 
 /** Live Gemini quotes for one ladder, from /api/ladder, every 30 seconds. Same contract as before the redesign. */
@@ -50,7 +51,7 @@ export function useTraces(windowSecs: number, symbols: readonly Symbol[] = SYMBO
       await Promise.all(
         key.split(",").map(async (sym) => {
           try {
-            const res = await fetchWithTimeout(historyUrl(sym, since));
+            const res = await fetchWithTimeout(appHistoryUrl(sym, since));
             if (!res.ok) return;
             const rows = parseHistory(await res.json())
               .filter((r) => r.ts >= since)
