@@ -8,7 +8,7 @@ Plain words, no slides needed for the short version. Every number here is checke
 >
 > Brace fixes that with prediction markets. Gemini lists markets like "will SOL be above 80 dollars tonight", at many prices. Together those odds tell you how far traders expect the price to move. Every minute, Brace posts those odds to Solana, and our program turns them into a borrowing limit: more expected movement, lower limit.
 >
-> The math runs onchain, so nobody can fake the number. It only ever tightens a limit, never loosens it past the governance cap, and it never liquidates anyone.
+> The math runs onchain from raw quotes, so anyone can check the number. Limits never go above the 75% governance cap, bad data only ever lowers them, and odds never liquidate anyone.
 >
 > It is live on devnet right now for SOL, Bitcoin, Ether, XRP and Zcash. Try to borrow over the limit and Solana itself rejects the transaction. That is Brace.
 
@@ -40,7 +40,7 @@ Use the 3-minute pitch, then add the live demo: let a judge hold the phone and t
 ## Judge Q&A
 
 **How accurate are the odds, and does Brace predict crashes?**
-Honest answer: we have not proven accuracy yet. [Alchin's measured hit rate here, or: "the tracker is running; we do not have a measured number to share yet."] What we have checked: the onchain fit matches an independent floating-point reference on a captured real SOL ladder (82.7% implied volatility, 69.6% limit). Brace does not predict direction. It reads how much movement traders are pricing and sizes the limit to that. Thin markets make the estimate noisy, which is why there is a confidence check and why noise can only tighten a limit, never loosen it past the cap.
+Over 8,303 hourly forecasts from Nov 17 to 19, the price stayed inside Brace's 1σ band 79.5% of the time, where a perfectly calibrated model gives 68%, so the limits run conservative. A non-overlapping check gives about 80% too. Caveats: two days of data, and the hourly forecasts overlap. We have also checked that the onchain fit matches an independent floating-point reference on a captured real SOL ladder (82.7% implied volatility, 69.6% limit). Brace does not predict direction. It reads how much movement traders are pricing and sizes the limit to that. Thin markets make the estimate noisy, which is why there is a confidence check, why stale or unconfident data only ever lowers a limit, and why no limit can go above the 75% cap.
 
 **Why prediction markets, not options or Chainlink?**
 Options-implied volatility is great where options exist, but most coins have no options market. Gemini lists ladders on assets like Zcash. Chainlink's volatility feeds are realized volatility, which looks backward; its own docs say realized is not implied. Prediction-market odds are forward-looking, public, and need no API key.

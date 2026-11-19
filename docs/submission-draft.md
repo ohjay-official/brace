@@ -81,7 +81,7 @@ A Cloudflare Worker reads Gemini's public prediction market API once a minute an
 **What makes it unique?** (451 chars)
 
 ```text
-Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, so the relayer cannot post a made-up value. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour. Odds never liquidate anyone; liquidation stays at a fixed 80%. And it covers assets with no options market, like ZEC, because Gemini lists them.
+Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, and every limit is clamped between 30% and a 75% cap. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour. Odds never liquidate anyone; liquidation stays at a fixed 80%. And it covers assets with no options market, like ZEC, because Gemini lists them.
 ```
 
 **What would you build next?** (356 chars)
@@ -105,7 +105,7 @@ Brace is a live risk oracle and a small lending pool on Solana devnet. Every min
 A Cloudflare Worker reads Gemini's public prediction market API once a minute and posts the raw bid and ask quotes to an Anchor program on Solana devnet. The program does the math with integers only: it turns each probability into a z-score, fits a line across the strikes, reads off implied volatility and the implied median, checks spot against that median, and sets limit = 80% x (1 - 3 x the 24-hour move), capped at 75%. Borrow and withdraw check that limit. A QuickNode Stream on the Block dataset, filtered to the program, sends every transaction, including rejected borrows, to the Worker, which stores it in D1 and serves the history the app charts.
 
 ## What makes it different
-Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, so the relayer cannot post a made-up value. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour. Odds never liquidate anyone; liquidation stays at a fixed 80%. And it covers assets with no options market, like ZEC, because Gemini lists them.
+Prediction markets used as risk infrastructure, not another betting app. The volatility number is computed onchain from raw quotes, and every limit is clamped between 30% and a 75% cap. It is fail safe: thin, stale or inconsistent data never loosens a limit, it holds, steps down, and pauses borrowing after an hour. Odds never liquidate anyone; liquidation stays at a fixed 80%. And it covers assets with no options market, like ZEC, because Gemini lists them.
 
 ## Proof
 - Program (devnet): `Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC` on [Solana Explorer](https://explorer.solana.com/address/Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC?cluster=devnet)

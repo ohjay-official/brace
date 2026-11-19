@@ -106,7 +106,7 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 | Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 109/109 worker tests passed on main (`a98012f`) on Nov 19, 2026. |
 | Keyed backup RPC for the relayer (PR #4) | In code on main and covered by the worker tests; not yet deployed to the live Worker. |
 | Streams sink and `/history` API | Live. `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
-| Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 92/92 app tests passed on main (`a98012f`) on Nov 19, 2026. |
+| Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 103/103 app tests passed on main (`f54e4d7`) on Nov 19, 2026. The board and History read the relayer through the app's cached `/api/history` and `/api/actions` routes. |
 | Accuracy tracker (Python, [`tracker/`](tracker/)) | Measured by Alchin from a live `/history` pull at 04:22 Lagos, Nov 19: 1σ band held 79.47% and 2σ 97.21% across 8,303 one hour forecasts (see Proof It's Real). |
 
 ## More Ways to Test
@@ -143,7 +143,7 @@ cargo build-sbf --manifest-path programs/brace/Cargo.toml && cargo test -p brace
 
 Use `cargo build-sbf`, not `anchor build`, in a fresh clone: `anchor build` creates a new program keypair and rewrites `declare_id`, and then the program id test fails on purpose.
 
-Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 109 worker tests and 92 app tests, re-run on main at `a98012f` on Nov 19, 2026.
+Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 109 worker tests and 103 app tests, re-run on main at `f54e4d7` on Nov 19, 2026.
 
 </details>
 
@@ -202,7 +202,7 @@ Each Gemini contract "price ≥ K at expiry" trades at a probability. Under a lo
 ### Economic Design and Risk Assumptions
 
 - **Collateral and debt.** Users deposit devnet SOL and borrow a test USD token (6 decimals) minted by the pool. Collateral is valued at Gemini's SOL spot price. Interest is 0%: this demonstrates the risk limit, not a full market.
-- **Borrow limit.** `limit = 80% x (1 - 3 x s)`, where `s` is the 24-hour move implied by Gemini's ladder. It is clamped between 30% and a 75% governance cap, so the market can only tighten a limit, never loosen it past what governance set.
+- **Borrow limit.** `limit = 80% x (1 - 3 x s)`, where `s` is the 24-hour move implied by Gemini's ladder. It is clamped between 30% and a 75% governance cap, so the market moves a limit only inside that band and never above the cap governance set.
 - **Liquidation.** Fixed at 80% LTV, never driven by odds. A liquidator repays the full debt and receives the collateral plus a 5% bonus.
 - **Assumptions.** Price at expiry is roughly lognormal, so the ladder's probabilities fit a straight line after a probit transform. Three 24-hour standard deviations is the safety margin. Gemini quotes are thin, so a post counts only with at least 3 two-sided quotes, spreads of 15 cents or less, expiry between 15 minutes and 72 hours, and spot within 3% of the ladder's implied median.
 - **When the assumptions fail.** Unconfident or stale data holds the last limit for 5 minutes, then steps it down 2.5 points every 5 minutes to a 50% floor (or the last limit, if lower), and pauses borrowing and liquidation after an hour. The relayer is trusted to post real quotes (see Known Limitations).
@@ -221,6 +221,7 @@ Reviewed in five separate passes (correctness, access control, financial logic, 
 - **Borrows can price collateral with spot up to an hour old.** The limit decays toward the 50% stale floor meanwhile (2.5 points every 5 minutes), but the price itself is not refreshed.
 - **Thin ladders can be leaned on.** A post counts with only 3 two-sided quotes and spreads up to 15 cents, so a few quotes could pull the fitted volatility down; the limit that results is still capped at 75%.
 - **The relayer is a single trusted key.** One keypair posts every feed; there is no quorum or second source.
+- **History can pause; limits cannot.** The relayer stores Streams rows in Cloudflare D1 on the free plan, which has a daily read limit. When it runs out, the relayer's `/history` and `/actions` answer 503 until 00:00 UTC, and the History page says so. Onchain posting, the board's live limits and borrowing are unaffected. The app now reads history through a cached proxy (5 minute buckets, served stale on error) so viewers share one read.
 - **Interest is 0%.** This is a risk-limit demo, not a full lending market.
 - **Devnet only.** Gemini liquidity is thin: quotes exist, trades are rare, which is why confidence scoring and fail-safe staleness exist.
 - **Phantom simulation of an over-limit borrow.** Phantom simulates before it signs, and the program refuses an over-limit borrow, so Phantom shows "Failed to simulate the results of this request". The user has to confirm past that warning for the rejected transaction to land onchain; the borrow page explains each tap first. Phantom also shows a new-domain notice for any site it has not reviewed yet.
