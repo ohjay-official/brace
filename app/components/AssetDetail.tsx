@@ -37,7 +37,7 @@ export function AssetDetail({ symbol }: { symbol: Symbol }) {
 
   return (
     <div className="asset-page">
-      <Stage symbol={symbol} id="asset-title">
+      <Stage symbol={symbol} id="asset-title" art="ladder">
         <nav className="aswitch" aria-label="Assets">
           {SYMBOLS.map((s) => (
             <Link key={s} href={`/asset/${s}`} aria-current={s === symbol ? "page" : undefined}>

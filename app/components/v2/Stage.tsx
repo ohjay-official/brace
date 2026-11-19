@@ -21,7 +21,7 @@ function tick(v: number): string {
  * onchain with the live Gemini quotes standing on it. Every mark comes from
  * devnet or /api/ladder; when either is missing the card says so.
  */
-export function Stage({ symbol, children, id }: { symbol: Symbol; children?: React.ReactNode; id?: string }) {
+export function Stage({ symbol, children, id, art = "scene" }: { symbol: Symbol; children?: React.ReactNode; id?: string; art?: "scene" | "ladder" }) {
   const m = useFeedModel(symbol);
   const ladder = useLadder(m.feed?.ticker || null);
   const [ref, W] = useWidth<HTMLDivElement>(520);
@@ -150,8 +150,8 @@ export function Stage({ symbol, children, id }: { symbol: Symbol; children?: Rea
   const stale = m.status === "stale";
   return (
     <section className={`stage${stale ? " is-stale" : ""}${m.limit === null ? " is-empty" : ""}`} aria-labelledby={id}>
-      <div className="scene" aria-hidden>
-        <span className="scene-img" />
+      <div className={`scene${art === "ladder" ? " scene-ladder" : ""}`} aria-hidden>
+        {art === "ladder" ? <LadderArt /> : <span className="scene-img" />}
         <span className="orb orb-a" />
         <span className="orb orb-b" />
         <span className="orb orb-c" />
@@ -218,5 +218,17 @@ export function Stage({ symbol, children, id }: { symbol: Symbol; children?: Rea
         </div>
       </div>
     </section>
+  );
+}
+
+/** Asset page signature: a stack of glass rungs shaped like an "ends above" curve. Decoration only, no data. */
+const RUNG_W = [96, 92, 85, 74, 60, 45, 32, 21, 13];
+function LadderArt() {
+  return (
+    <span className="lad-art">
+      {RUNG_W.map((w, i) => (
+        <span key={i} className="lad-rung" style={{ "--w": `${w}%`, "--i": i } as React.CSSProperties} />
+      ))}
+    </span>
   );
 }
