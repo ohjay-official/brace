@@ -152,9 +152,9 @@ Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random act
 Real captures of the live site on a 390 px phone viewport, Nov 19, 2026. Devnet data, test money.
 
 <p align="center">
-  <img src="docs/images/borrow.jpg" width="160" alt="The borrow page: Borrow up to the line, SOL live limit 70.6% at spot $74.58, and a Connect wallet button.">
-  <img src="docs/images/history.jpg" width="160" alt="The History page: 24 hour chart of SOL's limit and implied volatility, then Blocked and allowed borrows with three Blocked by the program rows marked RiskTightened.">
-  <img src="docs/images/asset-sol.jpg" width="160" alt="The SOL asset page: tabs for SOL, BTC, ETH, ZEC and XRP, and the SOL borrow limit, live, at 70.6%.">
+  <img src="docs/images/borrow.jpg" width="160" alt="The borrow page: Borrow up to the line, SOL live limit 70.8% at spot $74.46, and a Connect wallet button.">
+  <img src="docs/images/history.jpg" width="160" alt="The History page: 24 hour chart of SOL's limit and implied volatility, then Blocked and allowed borrows; each Blocked by the program row carries the shield logo and RiskTightened.">
+  <img src="docs/images/asset-sol.jpg" width="160" alt="The SOL asset page: tabs for SOL, BTC, ETH, ZEC and XRP, and the SOL borrow limit, live, at 70.8%.">
 </p>
 
 ## How the Sponsor Tech Is Used
