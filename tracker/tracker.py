@@ -1,4 +1,4 @@
-
+import argparse
 import urllib.request
 import json
 import time
@@ -9,8 +9,8 @@ BASE_URL = "https://brace-relayer.ohjaye0.workers.dev"
 ASSETS = ["SOL", "BTC", "ETH", "XRP", "ZEC"]
 INTERVAL = 60
 
-DATA_DIR = Path("data")
-DATA_DIR.mkdir(exist_ok=True)
+# Same folder analytics.py reads, whatever folder you run from.
+DATA_DIR = Path(__file__).resolve().parent / "data"
 
 
 def fetch_history(asset):
@@ -28,6 +28,7 @@ def fetch_history(asset):
 
 
 def save_history(asset, records):
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
     path = DATA_DIR / f"{asset}.json"
 
     existing = []
@@ -50,25 +51,49 @@ def save_history(asset, records):
     return len(history)
 
 
-def main():
+def run_once():
+    """One pass over every asset. Returns the number of assets that failed."""
+    print("\n", datetime.now(timezone.utc).isoformat())
+
+    failed = 0
+
+    for asset in ASSETS:
+        try:
+            records = fetch_history(asset)
+            total = save_history(asset, records)
+
+            print(f"[OK] {asset}: {total} records saved")
+
+        except Exception as error:
+            failed += 1
+            print(f"[ERROR] {asset}: {error}")
+
+    return failed
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Collect Brace forecast history into tracker/data/."
+    )
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="fetch every asset one time, then exit "
+             "(exit code 1 if any asset failed)",
+    )
+    args = parser.parse_args(argv)
+
     print("=== BRACE TRACKER ===")
+    print(f"Saving to: {DATA_DIR}")
+
+    if args.once:
+        return 1 if run_once() else 0
 
     while True:
-        print("\n", datetime.now(timezone.utc).isoformat())
-
-        for asset in ASSETS:
-            try:
-                records = fetch_history(asset)
-                total = save_history(asset, records)
-
-                print(f"[OK] {asset}: {total} records saved")
-
-            except Exception as error:
-                print(f"[ERROR] {asset}: {error}")
-
-        print("Next update in 60 seconds...")
+        run_once()
+        print(f"Next update in {INTERVAL} seconds...")
         time.sleep(INTERVAL)
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
