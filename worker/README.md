@@ -28,6 +28,8 @@ Do not enable the minute cron until Task 7 (program on devnet and relayer funded
 
 RPC: `RPC_URL` plus optional comma-separated `RPC_URLS` (OnFinality first, then Tatum). The relayer retries 429s with backoff and fails over to the next URL. Official `api.devnet.solana.com` 403s Cloudflare IPs.
 
+Backup RPC (optional): set a keyed devnet endpoint as the Worker **secret** `RPC_URL_BACKUP` (never a plain var, never in `wrangler.toml`: the key is in the URL). The relayer tries it only after every public URL fails, and errors have RPC URLs replaced with `[rpc]`, so the key never reaches logs or `/health`. Must start with `https://`; anything else is ignored. To add it from a phone: Cloudflare dashboard, Workers & Pages, `brace-relayer`, Settings, Variables and Secrets, Add, type **Secret**, name `RPC_URL_BACKUP`, value your QuickNode Solana Devnet HTTP URL, Deploy. To remove it, delete the secret: the relayer goes back to the public URLs only.
+
 ## Endpoints
 
 - `GET /health` → `{ ok, lastRun, lastError, lastSigs, feeds }` persisted in D1 (survives isolate recycle). `feeds[asset].ageSecs` is age of the last Stream-ingested post (or last relayer signature if none).

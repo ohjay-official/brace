@@ -16,7 +16,7 @@ import {
   type PendingSig,
   type SignatureStatusLike,
 } from "./confirm.ts";
-import { parseRpcUrls, rotateUrls, rpcAwareFetch, withRpcFallback } from "./rpc.ts";
+import { parseRpcUrls, relayerRpcUrls, rpcAwareFetch, withRpcFallback } from "./rpc.ts";
 import { selectLadder } from "./select.ts";
 import { buildHealthReport, D1Store, type BraceStore, type RelayerAssetState, type RelayerRunState } from "./store.ts";
 import { ingestPayload } from "./streams.ts";
@@ -29,6 +29,8 @@ export type Env = {
   PROGRAM_ID: string;
   RPC_URL?: string;
   RPC_URLS?: string;
+  /** Optional secret: keyed RPC URL, tried last. */
+  RPC_URL_BACKUP?: string;
   RELAYER_SECRET?: string;
   STREAMS_SINK_SECRET?: string;
   QN_SECURITY_TOKEN?: string;
@@ -230,7 +232,7 @@ export async function runOnce(env: Env, nowSeconds: number, fetchFn: typeof fetc
   const store = storeFromEnv(env);
   const relayer = loadRelayer(env.RELAYER_SECRET);
   const programId = new PublicKey(env.PROGRAM_ID);
-  const urls = rotateUrls(parseRpcUrls(env), nowSeconds);
+  const urls = relayerRpcUrls(env, nowSeconds);
   const rpcFetch = rpcAwareFetch(fetchFn);
 
   const { failed: confirmFailed, stillPending } = await confirmPendingSigs(store, urls, rpcFetch, nowSeconds);
@@ -284,7 +286,7 @@ export async function runOnce(env: Env, nowSeconds: number, fetchFn: typeof fetc
 
   for (let i = 0; i < batches.length; i++) {
     const batch = batches[i];
-    const batchUrls = rotateUrls(urls, i);
+    const batchUrls = relayerRpcUrls(env, nowSeconds + i);
     const raw = batch.tx.serialize();
     try {
       const { result: sig } = await withRpcFallback(
