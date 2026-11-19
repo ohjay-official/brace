@@ -83,3 +83,26 @@ Durability and funds:
 
 Pass 5 F3–F7 remain accepted risks (see above). They were not changed in this prep.
 
+
+## Pass 6: independent audit, cold judge and claims audit (Claude, Nov 19, 10:10 to 12:30 Lagos)
+
+Three fresh reviewer sessions that had not seen the build: a strict security audit of the program, Worker and app (findings reproduced with tests in a scratch clone), a cold judge that followed only the README, and a line-by-line claims audit of the README, Devpost draft, pitch, demo script and every live page.
+
+Security findings:
+
+| id | sev | finding | status |
+|---|---|---|---|
+| M1 | medium | Spot only updates on confident posts, so in a crash where the ladder lags spot by more than 3% (or spreads widen), liquidation runs on the pre-crash price for up to an hour, then fails with `StalePrice`. Bad debt can build. | Accepted for the hackathon (program unchanged two days before the deadline). Listed in Known Limitations. Fix: track spot freshness separately with a short age for borrow and liquidate. |
+| M2 | medium | Same root cause: after a dip, a healthy position can be liquidated on the old dip price for up to an hour (+23% to the liquidator in the reproduction). | Accepted, same fix as M1. Listed in Known Limitations. |
+| M3 | medium | The Streams sink decoded every `Program data:` line in any transaction whose logs mention the Brace id, so another program could plant fake rows in `/history`, `/actions` and `/health`. | Fixed in the Worker: only lines inside Brace's own frame count, events from failed transactions are dropped, rows more than 5 minutes in the future are refused. 8 tests; real devnet post and borrow logs give the same rows as before. Worker deploy pending. |
+| L1 | low | One future-dated row froze the history cache refresh. | Fixed with M3 (future rows refused). |
+| L2 | low | Midpoints snap to 50 bps steps before the fit; on steep or narrow ladders the limit can come out up to 1.5 points looser than a float fit (still capped at 75%). | Accepted, listed in Known Limitations. |
+| L3 | low | `initialize` front run on a fresh deploy. | Already listed; the live program is initialized. |
+| L4 | low | QuickNode signature check runs only if `QN_SECURITY_TOKEN` is set; no timestamp window. Replays are harmless (writes are idempotent). | Open. |
+| I1 | info | No security headers on the app. | Fixed: `frame-ancestors 'none'`, `X-Frame-Options: DENY`, `nosniff`, referrer policy. |
+| I2 | info | `security.json` was Anchor's template, with placeholder auditors and contacts. | Deleted. |
+| I3 | info | `/preview` could multiply Gemini calls across many IPs. | Open, low risk. |
+
+Checked and sound: signer, `has_one` and seed checks on every instruction; account substitution blocked by seeds, stored bumps and typed token accounts; withdraw and liquidation can't pay out more than the collateral; rounding favours the pool on borrow and withdraw and the borrower on liquidation; math has no panic on extreme inputs and every limit stays inside 30% to 75%; only system and token CPIs; Worker SQL is parameterised, secret comparison is constant time; app instruction builders match the IDL. The deployed program's SHA-256 equals a fresh `cargo build-sbf` of main.
+
+Claims audit: 38 claims corrected (see the commit "claims and judge audit fixes"), including the home headline, which now reads "Stale data can only lower it" (a confident post can raise a limit to the cap).

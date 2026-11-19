@@ -116,13 +116,53 @@ function firstKey(v: unknown): string | null {
 
 export type IngestResult = { posts: number; actions: number; txs: number };
 
-export async function ingestPayload(store: BraceStore, payload: unknown): Promise<IngestResult> {
+/** Rows dated further ahead than this are dropped (a future row would freeze the history cache). */
+export const MAX_FUTURE_SECS = 300;
+
+const INVOKE_RE = /^Program (\S+) invoke \[\d+\]$/;
+const EXIT_RE = /^Program (\S+) (success|failed\b)/;
+
+/**
+ * The log lines a program emitted itself: only lines written while it is the innermost running
+ * program, so another program that prints Brace's id or calls Brace cannot pass its lines off as Brace's.
+ */
+export function braceFrameLines(logs: string[], programId: string): string[] {
+  const stack: string[] = [];
+  const out: string[] = [];
+  for (const line of logs) {
+    const inv = INVOKE_RE.exec(line);
+    if (inv) {
+      stack.push(inv[1]);
+      continue;
+    }
+    const exit = EXIT_RE.exec(line);
+    if (exit && stack[stack.length - 1] === exit[1]) {
+      stack.pop();
+      continue;
+    }
+    if (stack[stack.length - 1] === programId && (line.startsWith("Program log: ") || line.startsWith("Program data: "))) out.push(line);
+  }
+  return out;
+}
+
+export type IngestOptions = {
+  /** When set, only Brace's own log lines count, events from failed transactions are dropped, and future rows are refused. */
+  programId?: string;
+  now?: number;
+};
+
+export async function ingestPayload(store: BraceStore, payload: unknown, opts: IngestOptions = {}): Promise<IngestResult> {
   const txs = extractStreamTxs(payload);
+  const now = opts.now ?? Math.floor(Date.now() / 1000);
   let posts = 0;
   let actions = 0;
   for (const tx of txs) {
-    const events = eventsFromLogs(tx.logMessages);
-    const ts = tx.blockTime ?? firstPostedAt(events) ?? 0;
+    const own = opts.programId ? braceFrameLines(tx.logMessages, opts.programId) : tx.logMessages;
+    const failedTx = tx.err != null && tx.err !== false;
+    // A failed transaction changed nothing onchain, so its events are not real (its rejection still is).
+    const events = opts.programId && failedTx ? [] : eventsFromLogs(own);
+    const ts = tx.blockTime ?? firstPostedAt(eventsFromLogs(own)) ?? 0;
+    if (opts.programId && ts > now + MAX_FUTURE_SECS) continue;
     for (const ev of events) {
       if (ev.name === "QuotesPosted") {
         await store.upsertPost(postFromEvent(ev, tx.signature, ts));
@@ -135,7 +175,7 @@ export async function ingestPayload(store: BraceStore, payload: unknown): Promis
         }
       }
     }
-    const failed = failedActionFromLogs(tx, ts, events);
+    const failed = opts.programId && !own.some((l) => BLOCKED_RE.test(l) || STALE_RE.test(l) || ERROR_CODE_RE.test(l)) ? null : failedActionFromLogs(tx, ts, events);
     if (failed) {
       await store.upsertAction(failed);
       actions++;

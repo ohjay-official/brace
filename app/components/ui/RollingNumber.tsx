@@ -24,9 +24,7 @@ export function RollingNumber({ value, className = "" }: { value: string; classN
           const d = DIGITS.indexOf(c);
           if (d < 0 || reduced) {
             return (
-              <span key={`${i}-${c}`} className="roll-ch">
-                {c}
-              </span>
+              <span key={`${i}-${c}`} className="roll-ch" data-ch={c} />
             );
           }
           return (

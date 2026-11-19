@@ -150,7 +150,7 @@ describe("D1 down: endpoints degrade instead of throwing (no 1101)", () => {
       spotE6: 71_965_000n, medianE6: 71_750_668n, points: 8, expiryTs: BigInt(NOW + 3600), ticker: "SOL2611182200",
       postedAt: BigInt(NOW),
     } as const;
-    const payload = { data: [{ signature: "POST_SIG_1", err: null, logMessages: [programDataLog(ev)], blockTime: NOW, signer: null }], metadata: { network: "solana-devnet" } };
+    const payload = { data: [{ signature: "POST_SIG_1", err: null, logMessages: [`Program ${PROGRAM_ID} invoke [1]`, programDataLog(ev), `Program ${PROGRAM_ID} success`], blockTime: NOW, signer: null }], metadata: { network: "solana-devnet" } };
     const res = await worker.fetch(
       new Request("https://example.com/streams", { method: "POST", headers: { "content-type": "application/json", "x-brace-secret": "s" }, body: JSON.stringify(payload) }),
       env(store),

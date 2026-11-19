@@ -7183,4 +7183,4 @@ body:has(.sheet.is-open) footer {
 .rungs-foot .key-item { white-space: nowrap; }
 
 /* rolling digits: drawn from data-ch so extracted page text holds each value once */
-.roll-strip > span::before, .roll-ghost::before { content: attr(data-ch); }
+.roll-strip > span::before, .roll-ghost::before, .roll-ch::before { content: attr(data-ch); }

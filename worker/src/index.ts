@@ -584,7 +584,7 @@ export default {
       }
       let result: Awaited<ReturnType<typeof ingestPayload>>;
       try {
-        result = await ingestPayload(store, payload);
+        result = await ingestPayload(store, payload, { programId: env.PROGRAM_ID, now: Math.floor(Date.now() / 1000) });
       } catch (err) {
         // 503 instead of the Worker throwing a 1101; QuickNode may redeliver the batch.
         const storeError = noteStoreError("streams", err);

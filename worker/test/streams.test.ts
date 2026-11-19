@@ -230,10 +230,11 @@ describe("worker HTTP sink and history", () => {
     const store = new MemoryStore();
     const ev = quotesFromSample(solSample);
     const payload = envelope([
-      filteredTx(TX_POST, [programDataLog(ev)], null, solSample.ts),
+      // Real logs, as Solana writes them: the worker only trusts lines inside Brace's own frame.
+      filteredTx(TX_POST, ["Program Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC invoke [1]", programDataLog(ev), "Program Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC success"], null, solSample.ts),
       filteredTx(
         TX_BLOCKED,
-        ["Program log: brace blocked ltv=8000 limit=7500", "Error Code: RiskTightened. Error Number: 6005."],
+        ["Program Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC invoke [1]", "Program log: brace blocked ltv=8000 limit=7500", "Program log: AnchorError occurred. Error Code: RiskTightened. Error Number: 6005.", "Program Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC failed: custom program error: 0x1775"],
         { InstructionError: [0, { Custom: 6005 }] },
         solSample.ts,
         owner,
