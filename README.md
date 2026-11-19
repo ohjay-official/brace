@@ -1,6 +1,6 @@
 # Brace
 
-**For judges:** Open the [live risk board](https://braced.vercel.app) (no wallet). Then try a borrow above SOL's limit and watch Solana reject it. A verified over-limit attempt is [this rejected transaction](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet). Steps are in [Try It](#try-it).
+**For judges:** open [braced.vercel.app](https://braced.vercel.app) (no wallet) and read SOL's live borrow limit. Then, with Phantom on Solana Devnet, borrow above that limit and watch the program reject it: [a verified rejected borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet). Steps are in [Try It](#try-it).
 
 <p align="center">
   <img src="docs/images/board.png" width="260" alt="Brace on a phone: the live SOL borrow limit at 70.7% with implied volatility 73.8%, and the curve of the chance SOL ends above each strike with 8 live Gemini quotes on the fit stored onchain.">
@@ -10,46 +10,35 @@
 
 Lending markets set loan-to-value limits by governance vote and rarely change them, so limits are still the calm-week numbers when volatility arrives. Brace reads Gemini's live "price X or above" ladders, computes implied volatility onchain on Solana, and tightens borrowing limits before the move. Limits never go above the 75% governance cap, stale data only ever lowers them, and odds never liquidate anyone.
 
-| What | Time and what it needs |
+| What | Steps, time and what it needs |
 |---|---|
-| [Live board](https://braced.vercel.app) | About a minute. No wallet. |
-| [Borrow demo](https://braced.vercel.app/borrow) | A few minutes. Phantom with Testnet Mode on Solana Devnet. |
-| [History page](https://braced.vercel.app/history) and [live `/history` feed](https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL) | Instant. No wallet. |
-| One-command check | A few minutes (the fuzz test is about a minute). `scripts/verify.sh` builds the program, runs every test suite and the app build, then checks the live relayer. Rust 1.89, Solana CLI (`cargo build-sbf`) and Node 20+. |
-| Film of the demo | Placeholder: the film link will be added here once it is recorded (B7). |
-| [Tracks](#tracks) | DeFi & Onchain Apps, Best use of Solana, Gemini Prediction Markets, QuickNode Streams. |
-
-- [Try it](#try-it)
-- [Proof it's real](#proof-its-real)
-- [How it compares](#how-it-compares)
-- [How Gemini, Solana and QuickNode are used](#how-the-sponsor-tech-is-used)
-- [Built during UBC 2026](#built-during-ubc-2026)
+| [Try It: the live board](#try-it) | 3 steps, no wallet. Measured: the live Gemini curve is on screen in 2.8 to 3.5 s. |
+| [Try It: a real borrow](#with-a-devnet-wallet) | 4 more steps. Phantom with Testnet Mode on Solana Devnet and free devnet SOL. Not timed. |
+| [Proof It's Real](#proof-its-real) | Explorer links for every claim. No wallet. |
+| [More Ways to Test](#more-ways-to-test) | One command (`scripts/verify.sh`) or each suite on its own. Rust 1.89, Solana CLI and Node 20+. |
+| Film of the demo | TBD-post-build: film link once it is recorded (B7). |
+| [Tracks](#tracks) and [how it was built](#built-during-ubc-2026) | DeFi & Onchain Apps, Best use of Solana, Gemini Prediction Markets, QuickNode Streams. |
 
 ## Try It
 
-1. Open the [live board](https://braced.vercel.app). No wallet, no signup. You should see the heading **Lending limits that move before the market does**, SOL's live borrow limit beside Gemini's ladder curve (**chance it ends above**), and **Five limits, traced for 24 hours** for SOL, BTC, ETH, XRP and ZEC.
-2. Tap **Try a borrow**. In Phantom, turn on Testnet Mode and select Solana Devnet. Tap **Connect wallet**, then **Open position**, then **Deposit** 0.5 SOL under the heading **Deposit SOL**.
-3. Slide the borrow amount past the live limit until the page says **Over the live limit**, tap **Submit anyway**, read the panel **What Phantom shows next**, then tap **Continue in Phantom**. Phantom shows a red "Failed to simulate the results of this request" because the program refuses the borrow: tap **Confirm (unsafe)**, tick the box, then **Yes, confirm (unsafe)**. The program should reject the transaction onchain with `RiskTightened` (error 6005). A verified run at 10:23 Africa/Lagos on Nov 17, 2026 logged `brace blocked ltv=7208 limit=6954`: [rejected borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet).
-4. Lower the amount under the limit and tap **Borrow**. A verified run at 10:24 Africa/Lagos borrowed 8.30 test USD and logged `brace borrow ... ltv=2303 limit=6952`: [accepted borrow](https://explorer.solana.com/tx/42EzMtDmmcengifcyTXjLY2BT3K1s8XCdVMEG3usorpbGiYEL5KgFHyBpWm9PyVi3Tymjg34PKqqmeCSQeJgehSf?cluster=devnet). Both attempts are already in the [Streams `/actions` feed](https://brace-relayer.ohjaye0.workers.dev/actions) and should appear on the [History](https://braced.vercel.app/history) page.
+You use the real app on Solana devnet, where every token is free test money. Steps 1 to 3 need no wallet and no signup.
 
-Check the code in these commands (Rust 1.89 and Anchor CLI 1.2.2 for the program):
+1. **Open [braced.vercel.app](https://braced.vercel.app).** You see **Lending limits that move before the market does**, SOL's live borrow limit, and Gemini's ladder drawn as **chance it ends above** each strike. Scroll to **Five limits, traced for 24 hours** for SOL, BTC, ETH, XRP and ZEC.
+2. **Tap Try a borrow.** The borrow page shows the same **SOL live limit**, a **Connect wallet** button and a **Before you start** list.
+3. **Open [History](https://braced.vercel.app/history).** You see 24 hours of SOL's limit and implied volatility, and **Blocked and allowed borrows**: each **Blocked by the program** row is a borrow Solana rejected, recorded by QuickNode Streams.
 
-```bash
-scripts/verify.sh            # everything below, then the live checks
-scripts/verify.sh --live     # only: app returns 200, relayer healthy, all five feeds posted in the last 2 minutes
-```
+You just saw a borrow limit computed onchain from Gemini's odds, and the borrows it has already stopped.
 
-Or step by step:
+Measured with Playwright Chromium at a 390 px phone viewport, cold cache, from our build machine on Nov 19, 2026 at 05:36 Lagos, 3 runs: the heading in 1.5 to 1.7 s, the Gemini curve in 2.8 to 3.5 s, the borrow page under 0.2 s after the tap, the History rows under 0.5 s. Reading time is yours.
 
-```bash
-cargo build-sbf --manifest-path programs/brace/Cargo.toml && cargo test -p brace
-(cd worker && npm ci && npx vitest run)
-(cd app && npm ci && npx vitest run && npm run build)
-```
+### With a Devnet Wallet
 
-Use `cargo build-sbf`, not `anchor build`, in a fresh clone: `anchor build` creates a new program keypair and rewrites `declare_id`, and then the program id test fails on purpose.
+4 steps, not timed. Open position, Deposit and each Borrow need one approval in Phantom.
 
-Expected, from a fresh run on Nov 19, 2026 (Africa/Lagos): 52 Rust tests pass (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions in 48.26s, 12 oracle, 9 pool, 3 relayer-encoding); 85 app tests; 95 worker tests.
+1. **In Phantom, open Settings, then Developer settings,** turn **Testnet mode** on and choose **Solana Devnet**. Get free devnet SOL at [faucet.solana.com](https://faucet.solana.com).
+2. **Open [braced.vercel.app/borrow](https://braced.vercel.app/borrow) in Phantom's in-app browser.** Tap **Connect wallet**, then **Open position**, then **Deposit** 0.5 SOL under **Deposit SOL**.
+3. **Slide the borrow amount past the limit** until the page says **Over the live limit**. Tap **Submit anyway**, read **What Phantom shows next**, then tap **Continue in Phantom**. Phantom shows a red "Failed to simulate the results of this request" because the program refuses the borrow: tap **Confirm (unsafe)**, tick the box, then **Yes, confirm (unsafe)**. The transaction lands onchain and fails with `RiskTightened` (error 6005). A verified run at 10:23 Lagos on Nov 17, 2026 logged `brace blocked ltv=7208 limit=6954`: [rejected borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet).
+4. **Lower the amount under the limit and tap Borrow.** It goes through. A verified run at 10:24 Lagos borrowed 8.30 test USD and logged `brace borrow ... ltv=2303 limit=6952`: [accepted borrow](https://explorer.solana.com/tx/42EzMtDmmcengifcyTXjLY2BT3K1s8XCdVMEG3usorpbGiYEL5KgFHyBpWm9PyVi3Tymjg34PKqqmeCSQeJgehSf?cluster=devnet). Both land in the [Streams `/actions` feed](https://brace-relayer.ohjaye0.workers.dev/actions) and on the [History](https://braced.vercel.app/history) page.
 
 ## Proof It's Real
 
@@ -93,7 +82,7 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 
 **Where Brace stands out**
 
-- The volatility number is computed onchain from raw Gemini quotes, so the relayer cannot post a made-up sigma.
+- **The volatility number is computed onchain** from raw Gemini quotes, so the relayer never posts a sigma. The quotes themselves are still trusted (see [Known Limitations](#known-limitations)).
 - Limits move from forward-looking implied vol, including on assets the live board already posts such as ZEC, not only from a governance vote or from backward-looking realized vol.
 - Thin or stale data never loosens a limit. After an hour without a fresh post, borrowing pauses.
 - Odds never liquidate anyone. Liquidation uses only the fixed 80% threshold. QuickNode Streams records rejected borrows as well as accepted ones (see the rejected transaction above).
@@ -104,20 +93,69 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 
 | Track | What fits | Where to check |
 |---|---|---|
-| DeFi & Onchain Apps | A lending risk primitive plus a working pool that enforces it | [`instructions/borrow.rs`](programs/brace/src/instructions/borrow.rs), Try It steps 3 and 4 |
+| DeFi & Onchain Apps | A lending risk primitive plus a working pool that enforces it | [`instructions/borrow.rs`](programs/brace/src/instructions/borrow.rs), [Try It](#with-a-devnet-wallet) wallet steps 3 and 4 |
 | Best use of Solana | Volatility math onchain in an Anchor program on devnet; a verified SOL `post_quotes` used 40,674 compute units | [`src/math.rs`](programs/brace/src/math.rs), [`instructions/post_quotes.rs`](programs/brace/src/instructions/post_quotes.rs), [the packed post](https://explorer.solana.com/tx/5cwQA5BzCHPZPJTDbs6bRiPX649mQr8v4vj8C2kXusPayhZk6pL5mmMC9nJtuKHqzw5ad2mhjHiFrgwNjRajcgNB?cluster=devnet) |
 | Gemini Prediction Markets | Gemini's live ladders are the only input to the oracle | [`worker/src/`](worker/src), [How Gemini is used](#how-the-sponsor-tech-is-used) |
-| QuickNode Streams | Stream `brace-program` on Solana devnet, filtered to the program id, delivers every successful and failed Brace transaction to the Worker `/streams` webhook. That feed powers `/history`, `/actions` and the History page, and is the input for Alchin's accuracy tracker (in progress). | [`worker/filters/brace-program.js`](worker/filters/brace-program.js), [live `/history`](https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL) |
+| QuickNode Streams | Stream `brace-program` on Solana devnet, filtered to the program id, delivers every successful and failed Brace transaction to the Worker `/streams` webhook. That feed powers `/history`, `/actions` and the History page, and is the input for Alchin's accuracy tracker, measured in [Proof It's Real](#proof-its-real). | [`worker/filters/brace-program.js`](worker/filters/brace-program.js), [live `/history`](https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL) |
 
 ## What Works Today
 
 | Piece | State |
 |---|---|
 | Brace program (oracle, limits, pool, liquidation) | Live on Solana devnet at the address above. 52/52 Rust tests passed on Nov 19, 2026. |
-| Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 95/95 worker tests passed on Nov 19, 2026. |
+| Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 109/109 worker tests passed on main (`a98012f`) on Nov 19, 2026. |
+| Keyed backup RPC for the relayer (PR #4) | In code on main and covered by the worker tests; not yet deployed to the live Worker. |
 | Streams sink and `/history` API | Live. `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
-| Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 85/85 app tests passed on Nov 19, 2026. |
+| Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 92/92 app tests passed on main (`a98012f`) on Nov 19, 2026. |
 | Accuracy tracker (Python, [`tracker/`](tracker/)) | Measured by Alchin from a live `/history` pull at 04:22 Lagos, Nov 19: 1σ band held 79.47% and 2σ 97.21% across 8,303 one hour forecasts (see Proof It's Real). |
+
+## More Ways to Test
+
+Quickest first. None needs a wallet.
+
+<details><summary><strong>1. Live checks only (under 1 s on Nov 19, 2026; bash, curl and python3)</strong></summary>
+
+```bash
+scripts/verify.sh --live
+```
+
+Checks the app returns 200, the relayer is healthy and all five feeds posted in the last 2 minutes, then prints `verify: all checks passed`. Without bash, the same data is public: `curl https://brace-relayer.ohjaye0.workers.dev/health`.
+
+</details>
+
+<details><summary><strong>2. One command for everything (not timed end to end; Rust 1.89, Solana CLI with cargo build-sbf, Node 20+)</strong></summary>
+
+```bash
+scripts/verify.sh
+```
+
+Builds the program, runs the Rust, worker and app suites with type checks, builds the app, then runs the live checks. It stops at the first failure. The fuzz run alone took 48.26 s on Nov 19, 2026.
+
+</details>
+
+<details><summary><strong>3. Each suite on its own (same tools as 2)</strong></summary>
+
+```bash
+cargo build-sbf --manifest-path programs/brace/Cargo.toml && cargo test -p brace
+(cd worker && npm ci && npx vitest run)
+(cd app && npm ci && npx vitest run && npm run build)
+```
+
+Use `cargo build-sbf`, not `anchor build`, in a fresh clone: `anchor build` creates a new program keypair and rewrites `declare_id`, and then the program id test fails on purpose.
+
+Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random actions, 12 oracle, 9 pool, 3 relayer encoding), from a fresh run on Nov 19, 2026; 109 worker tests and 92 app tests, re-run on main at `a98012f` on Nov 19, 2026.
+
+</details>
+
+## Screenshots
+
+Real captures of the live site on a 390 px phone viewport, Nov 19, 2026. Devnet data, test money.
+
+<p align="center">
+  <img src="docs/images/borrow.jpg" width="160" alt="The borrow page: Borrow up to the line, SOL live limit 70.6% at spot $74.58, and a Connect wallet button.">
+  <img src="docs/images/history.jpg" width="160" alt="The History page: 24 hour chart of SOL's limit and implied volatility, then Blocked and allowed borrows with three Blocked by the program rows marked RiskTightened.">
+  <img src="docs/images/asset-sol.jpg" width="160" alt="The SOL asset page: tabs for SOL, BTC, ETH, ZEC and XRP, and the SOL borrow limit, live, at 70.6%.">
+</p>
 
 ## How the Sponsor Tech Is Used
 
@@ -161,7 +199,7 @@ Each Gemini contract "price ≥ K at expiry" trades at a probability. Under a lo
 
 </details>
 
-### Economic design and risk assumptions
+### Economic Design and Risk Assumptions
 
 - **Collateral and debt.** Users deposit devnet SOL and borrow a test USD token (6 decimals) minted by the pool. Collateral is valued at Gemini's SOL spot price. Interest is 0%: this demonstrates the risk limit, not a full market.
 - **Borrow limit.** `limit = 80% x (1 - 3 x s)`, where `s` is the 24-hour move implied by Gemini's ladder. It is clamped between 30% and a 75% governance cap, so the market can only tighten a limit, never loosen it past what governance set.
@@ -207,10 +245,26 @@ Reviewed in five separate passes (correctness, access control, financial logic, 
 
 - First commit: `a71e7ef`, 2026-11-15 23:14 Lagos (16:14 CST). No earlier code, template or boilerplate beyond `anchor init`. Check: `git log --reverse --format='%h %ad %s' --date=iso | head -3`.
 - Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions and handles every wallet and account step. Every change passed its tests before merge.
-- Runtime: Anchor 1.2.2 (`anchor-lang`, `anchor-spl` with SPL Token), `@solana/web3.js` 1.99.0, Next.js 15.5.29, React 19.3.1.
+- Runtime: Anchor 1.2.2 (`anchor-lang`, `anchor-spl` with SPL Token), `@solana/web3.js` 1.99.0, Next.js 15.5.29, React 19.3.1, `@vercel/analytics` 2.0.1.
 - Development: LiteSVM 0.15.0, Vitest 5.1.0 (app and worker), TypeScript 5.9.3, Wrangler 4.163.0.
 - Services: Gemini Prediction Markets public API, Solana devnet, Cloudflare Workers, QuickNode Streams, Vercel.
 - Team: Oh-Jay led development, Alchin Daryabari built the forecast validation and analytics tracker, and Omar Dosuyev led the presentation.
+- Event rules answered ([`docs/event.md`](docs/event.md)): FAQ 04 asks for a public repo, a working deployed app, a 2 to 3 minute video and a README with technical docs; FAQ 07 allows AI tools, and the AI use above is disclosed anyway.
+- The live site and relayer stay up through judging and after.
+
+<details><summary><strong>What was built each day (from the commit log, Lagos time)</strong></summary>
+
+| Day | Built |
+|---|---|
+| Sun Nov 15 | README, event rules, research and the Brace brief |
+| Mon Nov 16 | Spec and plan, Anchor workspace, onchain implied volatility math, oracle feed and quote posting, demo lending pool, fuzz and invariant suite, first review fixes |
+| Tue Nov 17 | Review pass 5 fixes, Cloudflare relayer Worker, Streams sink and history API, devnet deploy, risk board, borrow flow, history page, verify script, MIT licence |
+| Wed Nov 18 | Repo hygiene, Alchin's forecast validation tracker, site redesign, relayer D1 outage fix, Phantom borrow proof, new logo and share card |
+| Thu Nov 19 | Fresh test counts, privacy page, web analytics, rate limits, tablet header fix, README claims audit, keyed backup RPC (PR #4), this README |
+
+Check: `git log --reverse --format='%h %ad %s' --date=iso`.
+
+</details>
 
 ## License
 
