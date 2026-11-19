@@ -1,5 +1,5 @@
 import { ArrowUpRight, Check, Loader2, ShieldAlert, ShieldX, Wallet } from "lucide-react";
-import { BraceMark } from "./BraceMark";
+import { Logo } from "./Logo";
 import { comparePcts } from "./display";
 
 export type VerdictKind = "blocked" | "paused" | "failed" | "cancelled" | "success";
@@ -61,7 +61,7 @@ export function VerdictPanel({
     <div className={`verdict v-${kind}`} role={kind === "success" || kind === "cancelled" ? "status" : "alert"}>
       <div className="verdict-top">
         <span className="verdict-icon">
-          {kind === "blocked" ? <BraceMark size={26} /> : <Icon size={20} aria-hidden />}
+          {kind === "blocked" ? <Logo size={26} /> : <Icon size={20} aria-hidden />}
         </span>
         <div className="verdict-title">
           <span className="verdict-k">{label}</span>

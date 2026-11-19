@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMeta(
 
 export default function HistoryPage() {
   return (
-    <div className="page wrap">
+    <div className="page wrap history-page">
       <PageHead
         kicker="History"
         title="Every limit, every reject"
@@ -22,6 +22,13 @@ export default function HistoryPage() {
           </>
         }
       />
+      <div className="tape" aria-hidden>
+        <div className="tape-run">
+          {Array.from({ length: 4 }, (_, k) => (
+            <span key={k}>SOL · BTC · ETH · XRP · ZEC · every minute, onchain · </span>
+          ))}
+        </div>
+      </div>
       <HistoryView />
     </div>
   );
