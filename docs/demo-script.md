@@ -70,7 +70,7 @@ Total: 2:30. Times are cumulative.
 **Shot 3 · 0:32 to 0:42 (10 s) · ZEC vs BTC**
 - Tap: back to the board (the Brace name at the top).
 - On screen: ZEC's limit next to BTC's.
-- Voiceover: "zcash has no options market, but gemini prices it. so zec gets a tighter limit than bitcoin, right now."
+- Voiceover: "every asset gets its own limit from its own odds. zcash is wilder than bitcoin, so zec gets a tighter limit, right now."
 - Check before saying it: ZEC's max LTV should be lower than BTC's on screen. It has been all week, but if it is not, say "every asset gets its own limit, right now" instead.
 
 ### Clip B (Phantom in-app browser)
@@ -84,8 +84,8 @@ Total: 2:30. Times are cumulative.
 
 **Shot 5 · 1:00 to 1:22 (22 s) · over the limit, rejected**
 - Tap: drag the borrow amount up until the page says it is over the live limit.
-- Tap: **Submit anyway**. The note under it says Phantom will warn the transaction may fail.
-- In Phantom: the warning appears. Tap the option that confirms anyway, then approve.
+- Tap: **Submit anyway**, read the panel **What Phantom shows next**, then tap **Continue in Phantom**.
+- In Phantom: a red "Failed to simulate the results of this request" appears, because the program refuses the borrow. Tap **Confirm (unsafe)**, tick the box, then **Yes, confirm (unsafe)**. These are the same words as README Try It step 3.
 - On screen: "Rejected onchain: this borrow would put you at X% against a live limit of Y%."
 - Voiceover: "this is over the limit. phantom warns me, and i send it anyway. solana rejects it. not the website, the program itself, using the limit gemini's odds set a minute ago."
 - Confirm within about 30 seconds of tapping Submit anyway. A slow confirm lets the transaction expire (see Fallbacks).
@@ -108,14 +108,18 @@ Total: 2:30. Times are cumulative.
 - On screen: the limit chart over time and the list of blocked and allowed borrows.
 - Voiceover, part 1 (about 10 s): "quicknode streams records every limit update and every borrow, including the failed ones. that history is how we check the oracle."
 - Voiceover, part 2 (about 10 s), pick one:
-  - With Alchin's number: "**[[HIT RATE FROM ALCHIN: say the exact measured result and what it measures, for example over how many windows]]**."
+  - With Alchin's number: "in two days of live data, prices stayed inside the one-hour band **[LOW] to [HIGH]** percent of the time. sixty-eight was expected, so the limits run cautious."
   - Without a number: "next, we are scoring these limits against what prices actually did."
+- Fill [LOW] and [HIGH] from the five **1H HIT RATE → 1 Sigma Hit Rate** lines in `tracker/reports/hit_rate.txt`, rounded to whole numbers. Alchin runs `python tracker/tracker.py --once` then `python tracker/report.py` the night before recording (needs PR #2 merged; before that, run `python tracker.py` from inside `tracker/` and stop it with Ctrl+C after the first pass) and confirms the numbers. A test run at 03:35 UTC on Nov 19 gave 71% (BTC) to 85% (XRP) across the five assets, from about two days of data. Numbers move with every run: use the fresh report, not these.
+- Use the 1-hour numbers only. The 24-hour hit rates (many at 100%) come from overlapping windows over about two days, so they don't prove anything yet. Never quote them.
+- If any asset's 1-hour rate drops below 68%, the "cautious" line is no longer true: use the "Without a number" line instead.
 - Never say a number Alchin has not measured and written down.
 
 **Shot 9 · 2:18 to 2:30 (12 s) · close**
 - URL: `https://github.com/ohjay-official/brace` (open in Chrome).
 - On screen: the README top, with the live app link.
-- Voiceover: "odds can only tighten a limit, never liquidate anyone. it is open source, live on devnet, and the link is below. this is brace."
+- Voiceover: "limits never pass the governance cap, bad data only lowers them, and odds never liquidate anyone. it is open source, live on devnet, and the link is below. this is brace."
+- Do not say "odds can only tighten a limit": a calmer market lets a new confident post raise the limit, up to the 75% cap (`docs/reviews.md` Pass 5 F7).
 
 ## 4. Fallbacks
 
