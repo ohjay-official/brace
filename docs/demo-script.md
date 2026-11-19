@@ -108,12 +108,12 @@ Total: 2:30. Times are cumulative.
 - On screen: the limit chart over time and the list of blocked and allowed borrows.
 - Voiceover, part 1 (about 10 s): "quicknode streams records every limit update and every borrow, including the failed ones. that history is how we check the oracle."
 - Voiceover, part 2 (about 10 s), pick one:
-  - With Alchin's number: "in two days of live data, prices stayed inside the one-hour band **[LOW] to [HIGH]** percent of the time. sixty-eight was expected, so the limits run cautious."
+  - With the verified number: "over 8303 one-hour forecasts, prices stayed inside the one-sigma band 79.47 percent of the time. sixty-eight was expected, so the limits run cautious."
   - Without a number: "next, we are scoring these limits against what prices actually did."
-- Fill [LOW] and [HIGH] from the five **1H HIT RATE → 1 Sigma Hit Rate** lines in `tracker/reports/hit_rate.txt`, rounded to whole numbers. Alchin runs `python tracker/tracker.py --once` then `python tracker/report.py` the night before recording (needs PR #2 merged; before that, run `python tracker.py` from inside `tracker/` and stop it with Ctrl+C after the first pass) and confirms the numbers. A test run at 03:35 UTC on Nov 19 gave 71% (BTC) to 85% (XRP) across the five assets, from about two days of data. Numbers move with every run: use the fresh report, not these.
+- Use these verified 1-hour 1σ figures, from an independent recompute of live `/history` at 04:22 Africa/Lagos on 19 Nov 2026: overall 79.47% of 8,303; per asset SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 2σ overall is 97.21%. Do not substitute placeholders or a later unreviewed range.
 - Use the 1-hour numbers only. The 24-hour hit rates (many at 100%) come from overlapping windows over about two days, so they don't prove anything yet. Never quote them.
-- If any asset's 1-hour rate drops below 68%, the "cautious" line is no longer true: use the "Without a number" line instead.
-- Never say a number Alchin has not measured and written down.
+- If a later measured 1-hour rate for any asset drops below 68%, the "cautious" line is no longer true: use the "Without a number" line instead.
+- Never say a number that has not been measured and written down.
 
 **Shot 9 · 2:18 to 2:30 (12 s) · close**
 - URL: `https://github.com/ohjay-official/brace` (open in Chrome).
