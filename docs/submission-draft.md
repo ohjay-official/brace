@@ -21,7 +21,7 @@ Paste-ready fields for https://ubc-hackathon-2026.devpost.com. Checked against t
 | Field | Text | Chars | Limit |
 |---|---|---|---|
 | Project name | Brace | 5 | 60 |
-| Tagline (elevator pitch) | Gemini prediction markets as an onchain volatility oracle that tightens Solana lending limits before the market moves. | 118 | 200 on the participant form; 140 in Devpost's host docs, so this stays under 140 |
+| Tagline (elevator pitch) | Gemini prediction markets as an onchain volatility oracle that sets how much you can borrow on Solana. | 102 | 200 on the participant form; 140 in Devpost's host docs, so this stays under 140 |
 | Thumbnail | `app/app/opengraph-image.jpg` (1200x630). Devpost suggests 3:2, 5 MB max; the image is 87 KB; check the crop in the preview | | |
 
 ## Step 2: Track, chain award, bounties, prize opt-ins
