@@ -1,0 +1,183 @@
+BRACE - FORECAST VALIDATION REPORT
+=============================================
+Generated: 2026-11-20T04:36:02.230628+00:00
+
+========== SOL ==========
+Total records: 3357
+Records with valid timestamps: 3357
+
+--- 24H HIT RATE ---
+Evaluated forecasts: 1243
+Pending forecasts: 1407
+Skipped forecasts (data gap): 707
+Invalid records: 0
+Total accounted for: 3357
+1 Sigma Hits: 1243/1243
+2 Sigma Hits: 1243/1243
+1 Sigma Hit Rate: 100.00%
+2 Sigma Hit Rate: 100.00%
+Start TS: 1794887962
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:22+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795062921
+
+--- 1H HIT RATE ---
+Evaluated forecasts: 3166
+Pending forecasts: 60
+Skipped forecasts (data gap): 131
+Invalid records: 0
+Total accounted for: 3357
+1 Sigma Hits: 2435/3166
+2 Sigma Hits: 3035/3166
+1 Sigma Hit Rate: 76.91%
+2 Sigma Hit Rate: 95.86%
+Start TS: 1794887962
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:22+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795145665
+
+========== BTC ==========
+Total records: 3427
+Records with valid timestamps: 3427
+
+--- 24H HIT RATE ---
+Evaluated forecasts: 1289
+Pending forecasts: 1406
+Skipped forecasts (data gap): 732
+Invalid records: 0
+Total accounted for: 3427
+1 Sigma Hits: 916/1289
+2 Sigma Hits: 1289/1289
+1 Sigma Hit Rate: 71.06%
+2 Sigma Hit Rate: 100.00%
+Start TS: 1794887963
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:23+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795062921
+
+--- 1H HIT RATE ---
+Evaluated forecasts: 3276
+Pending forecasts: 60
+Skipped forecasts (data gap): 91
+Invalid records: 0
+Total accounted for: 3427
+1 Sigma Hits: 2307/3276
+2 Sigma Hits: 3091/3276
+1 Sigma Hit Rate: 70.42%
+2 Sigma Hit Rate: 94.35%
+Start TS: 1794887963
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:23+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795145665
+
+========== ETH ==========
+Total records: 3237
+Records with valid timestamps: 3237
+
+--- 24H HIT RATE ---
+Evaluated forecasts: 1139
+Pending forecasts: 1407
+Skipped forecasts (data gap): 691
+Invalid records: 0
+Total accounted for: 3237
+1 Sigma Hits: 1137/1139
+2 Sigma Hits: 1139/1139
+1 Sigma Hit Rate: 99.82%
+2 Sigma Hit Rate: 100.00%
+Start TS: 1794887966
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:26+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795062921
+
+--- 1H HIT RATE ---
+Evaluated forecasts: 3029
+Pending forecasts: 60
+Skipped forecasts (data gap): 148
+Invalid records: 0
+Total accounted for: 3237
+1 Sigma Hits: 2386/3029
+2 Sigma Hits: 2955/3029
+1 Sigma Hit Rate: 78.77%
+2 Sigma Hit Rate: 97.56%
+Start TS: 1794887966
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:26+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795145665
+
+========== XRP ==========
+Total records: 3218
+Records with valid timestamps: 3218
+
+--- 24H HIT RATE ---
+Evaluated forecasts: 1121
+Pending forecasts: 1407
+Skipped forecasts (data gap): 690
+Invalid records: 0
+Total accounted for: 3218
+1 Sigma Hits: 1121/1121
+2 Sigma Hits: 1121/1121
+1 Sigma Hit Rate: 100.00%
+2 Sigma Hit Rate: 100.00%
+Start TS: 1794887967
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:27+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795062921
+
+--- 1H HIT RATE ---
+Evaluated forecasts: 3010
+Pending forecasts: 60
+Skipped forecasts (data gap): 148
+Invalid records: 0
+Total accounted for: 3218
+1 Sigma Hits: 2511/3010
+2 Sigma Hits: 2957/3010
+1 Sigma Hit Rate: 83.42%
+2 Sigma Hit Rate: 98.24%
+Start TS: 1794887967
+End TS: 1795149322
+Start UTC: 2026-11-17T03:59:27+00:00
+End UTC: 2026-11-20T04:35:22+00:00
+Last forecast TS: 1795145665
+
+========== ZEC ==========
+Total records: 3344
+Records with valid timestamps: 3344
+
+--- 24H HIT RATE ---
+Evaluated forecasts: 1258
+Pending forecasts: 1392
+Skipped forecasts (data gap): 694
+Invalid records: 0
+Total accounted for: 3344
+1 Sigma Hits: 1220/1258
+2 Sigma Hits: 1258/1258
+1 Sigma Hit Rate: 96.98%
+2 Sigma Hit Rate: 100.00%
+Start TS: 1794887969
+End TS: 1795149323
+Start UTC: 2026-11-17T03:59:29+00:00
+End UTC: 2026-11-20T04:35:23+00:00
+Last forecast TS: 1795062921
+
+--- 1H HIT RATE ---
+Evaluated forecasts: 3175
+Pending forecasts: 56
+Skipped forecasts (data gap): 113
+Invalid records: 0
+Total accounted for: 3344
+1 Sigma Hits: 2596/3175
+2 Sigma Hits: 3078/3175
+1 Sigma Hit Rate: 81.76%
+2 Sigma Hit Rate: 96.94%
+Start TS: 1794887969
+End TS: 1795149323
+Start UTC: 2026-11-17T03:59:29+00:00
+End UTC: 2026-11-20T04:35:23+00:00
+Last forecast TS: 1795145665

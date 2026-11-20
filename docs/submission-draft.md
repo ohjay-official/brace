@@ -54,7 +54,7 @@ Names below are copied from the Devpost prize list.
 | Working demo or deployed app | Met | https://braced.vercel.app |
 | 2 to 3 minute video on YouTube or Google Drive, accessible to judges | Needs Oh-Jay | docs/demo-script.md |
 | README with technical docs and architecture overview | Met | README How It Works (diagram) |
-| All team members listed | Needs both teammates' Devpost accounts (Alchin Daryabari, Omar Dosuyev) | Team section |
+| All team members listed | Needs both teammates' Devpost accounts (Alchin Daryabarijavad, Omar Dosuyev) | Team section |
 
 ## Step 3: Written answers
 
