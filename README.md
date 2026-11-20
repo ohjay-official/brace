@@ -1,6 +1,6 @@
 # Brace
 
-**For judges:** open [braced.vercel.app](https://braced.vercel.app) (no wallet) and read SOL's live borrow limit. Then, with Phantom on Solana Devnet, borrow above that limit and watch the program reject it: [a verified rejected borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet). Steps are in [Try It](#try-it).
+**For judges:** open [braced.vercel.app](https://braced.vercel.app) (no wallet) and read SOL's live borrow limit. Then, with Phantom on Solana Devnet, borrow above that limit and watch the program reject it: [a verified rejected borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet). Steps are in [Try It](#try-it). Or watch the [2:23 film](https://youtu.be/zA3QOZgtJSI).
 
 <p align="center">
   <img src="docs/images/board.jpg" width="260" alt="Brace on a phone: SOL borrow limit, live, at 69.5% with implied vol 83.9%, a gauge showing the 75% cap and the 80% liquidation line, and the curve of the chance SOL ends above each strike from 13 Gemini quotes on the fit stored onchain, spot $72.10.">
@@ -16,7 +16,7 @@ Lending markets set loan-to-value limits by governance vote and rarely change th
 | [Try It: a real borrow](#with-a-devnet-wallet) | 4 more steps. Phantom with Testnet Mode on Solana Devnet and free devnet SOL. Not timed. |
 | [Proof It's Real](#proof-its-real) | Explorer links for every claim. No wallet. |
 | [More Ways to Test](#more-ways-to-test) | One command (`scripts/verify.sh`) or each suite on its own. Rust 1.89, Solana CLI and Node 20+. |
-| Film of the demo | TBD-post-build: film link once it is recorded. |
+| [Film of the demo](https://youtu.be/zA3QOZgtJSI) | 2:23 on YouTube. The idea, the math, a borrow the program rejected and its Explorer log, the accuracy check and the limits. |
 | [Tracks](#tracks) and [how it was built](#built-during-ubc-2026) | DeFi & Onchain Apps, Best use of Solana, Gemini Prediction Markets, QuickNode Streams. |
 
 ## Try It

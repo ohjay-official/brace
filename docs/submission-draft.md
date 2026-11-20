@@ -8,7 +8,7 @@ Paste-ready fields for https://ubc-hackathon-2026.devpost.com. Checked against t
 
 | Item | Why | Where it goes |
 |---|---|---|
-| Video link (YouTube, unlisted, 2 to 3 min) | Must be recorded on the phone (docs/demo-script.md) | Video demo link field; README line 19 |
+| Video link (YouTube, unlisted, 2 to 3 min) | Done: https://youtu.be/zA3QOZgtJSI (2:23) | Video demo link field; README line 19 |
 | Omar's Devpost account | Teammates are added by Devpost invite and must accept it | Team section |
 | Alchin's Devpost account | Same | Team section |
 | Alchin's hit rate | Done: 79.5% inside 1σ over 8,303 one-hour forecasts (preliminary) | Story Proof list, README Proof section, video shot 8 |
@@ -52,7 +52,7 @@ Names below are copied from the Devpost prize list.
 | QuickNode: Streams as a core data source; one Stream with a filter and destination; README explains network, dataset, filter, destination and why | Met (dataset and why added Nov 17) | README QuickNode Streams; worker/filters/brace-program.js |
 | Repo public, created during the week (work before Nov 13 not allowed) | Met. First commit Nov 15, 23:14 Lagos | README Built During UBC 2026 |
 | Working demo or deployed app | Met | https://braced.vercel.app |
-| 2 to 3 minute video on YouTube or Google Drive, accessible to judges | Needs Oh-Jay | docs/demo-script.md |
+| 2 to 3 minute video on YouTube or Google Drive, accessible to judges | Done: https://youtu.be/zA3QOZgtJSI (2:23, unlisted) | docs/demo-script.md |
 | README with technical docs and architecture overview | Met | README How It Works (diagram) |
 | All team members listed | Needs both teammates' Devpost accounts (Alchin Daryabarijavad, Omar Dosuyev) | Team section |
 
@@ -140,7 +140,7 @@ solana, anchor, rust, typescript, next.js, react, vercel, cloudflare-workers, cl
 | Try it out (borrow) | https://braced.vercel.app/borrow |
 | Try it out (history) | https://braced.vercel.app/history |
 | Code repository | https://github.com/ohjay-official/brace |
-| Video demo link | **[[YOUTUBE LINK FROM OH-JAY]]** |
+| Video demo link | https://youtu.be/zA3QOZgtJSI |
 | Program id (devnet), if asked | Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC |
 | Relayer health | https://brace-relayer.ohjaye0.workers.dev/health |
 | Streams history feed | https://brace-relayer.ohjaye0.workers.dev/history?asset=SOL |
@@ -161,9 +161,9 @@ Grok Bot did real build work on Brace. It ran the pre-submission ship check end 
 
 ## Check before pressing Submit
 
-- [ ] Video plays in a logged-out browser and is 2:00 to 3:00 long
+- [x] Video plays in a logged-out browser and is 2:00 to 3:00 long (2:23, oEmbed public check passed)
 - [ ] Live board shows five fresh rows at the moment you submit
 - [ ] All teammates accepted the Devpost invite
-- [ ] README line 19 has the video link (push to main)
+- [x] README line 19 has the video link (push to main)
 - [ ] Track, chain award and every bounty selected, matching prizes ticked
 - [ ] Preview the project page with View and check the markdown renders
