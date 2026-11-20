@@ -69,7 +69,7 @@ Brace is a live risk oracle and a small lending pool on Solana devnet. Every min
 **What problem does it solve?** (469 chars)
 
 ```text
-Lending markets set loan-to-value limits by governance vote and rarely change them. When volatility arrives, limits are still the calm-week numbers, so the protection arrives after the move. Forward-looking volatility usually comes from options markets, which most long-tail assets do not have. Gemini's prediction markets already price where these assets will be at expiry, including ZEC, so Brace uses those odds to tighten limits before the move instead of after it.
+Lending markets set loan-to-value limits by governance vote and rarely change them. When volatility arrives, limits are still the calm-week numbers, so the protection arrives after the move. Forward-looking volatility usually comes from options markets, which most long-tail assets do not have. Gemini's prediction markets already price where these assets will be at expiry, including ZEC, so Brace uses those odds to lower limits as soon as traders price a bigger move, instead of waiting for a vote.
 ```
 
 **How does it work?** (658 chars)
@@ -96,7 +96,7 @@ No hard limit is published for this field. Paste everything between the fences.
 
 ````markdown
 ## Inspiration
-Lending markets set loan-to-value limits by governance vote and rarely change them. When volatility arrives, limits are still the calm-week numbers, so the protection arrives after the move. Forward-looking volatility usually comes from options markets, which most long-tail assets do not have. Gemini's prediction markets already price where these assets will be at expiry, including ZEC, so Brace uses those odds to tighten limits before the move instead of after it.
+Lending markets set loan-to-value limits by governance vote and rarely change them. When volatility arrives, limits are still the calm-week numbers, so the protection arrives after the move. Forward-looking volatility usually comes from options markets, which most long-tail assets do not have. Gemini's prediction markets already price where these assets will be at expiry, including ZEC, so Brace uses those odds to lower limits as soon as traders price a bigger move, instead of waiting for a vote.
 
 ## What it does
 Brace is a live risk oracle and a small lending pool on Solana devnet. Every minute it reads Gemini's "price X or above" prediction market ladders for SOL, BTC, ETH, XRP and ZEC, works out the implied volatility onchain, and turns each into a loan-to-value limit. The demo pool takes SOL collateral and enforces SOL's limit on every borrow: over the limit, the program rejects the transaction; under it, the borrow goes through. A public risk board, a borrow page that works in Phantom on a phone, and a history page show it live.
