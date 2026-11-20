@@ -147,7 +147,7 @@ solana, anchor, rust, typescript, next.js, react, vercel, cloudflare-workers, cl
 
 ## Step 7: Image gallery (optional, 3:2 suggested)
 
-- `docs/images/board.png` (the README phone shot of the board)
+- `docs/images/board.jpg` (the README phone shot of the board)
 - `app/app/opengraph-image.jpg`
 - Fresh phone screenshots from the recording day: the asset page, the rejected-borrow message, the History page.
 

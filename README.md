@@ -3,12 +3,12 @@
 **For judges:** open [braced.vercel.app](https://braced.vercel.app) (no wallet) and read SOL's live borrow limit. Then, with Phantom on Solana Devnet, borrow above that limit and watch the program reject it: [a verified rejected borrow](https://explorer.solana.com/tx/59uvMm48LV248sXSnvTV9wb8ZpVZmB8Q3ffiAsq3NU97wjU3wuSGD4EBSihWYpm1qZhrQNATA5rz5v1GWH6RVHnP?cluster=devnet). Steps are in [Try It](#try-it).
 
 <p align="center">
-  <img src="docs/images/board.png" width="260" alt="Brace on a phone: the live SOL borrow limit at 70.7% with implied volatility 73.8%, and the curve of the chance SOL ends above each strike with 8 live Gemini quotes on the fit stored onchain.">
+  <img src="docs/images/board.jpg" width="260" alt="Brace on a phone: SOL borrow limit, live, at 69.5% with implied vol 83.9%, a gauge showing the 75% cap and the 80% liquidation line, and the curve of the chance SOL ends above each strike from 13 Gemini quotes on the fit stored onchain, spot $72.10.">
 </p>
 
 **Gemini's prediction markets, turned into an onchain volatility oracle for Solana lending.**
 
-Lending markets set loan-to-value limits by governance vote and rarely change them, so limits are still the calm-week numbers when volatility arrives. Brace reads Gemini's live "price X or above" ladders, computes implied volatility onchain on Solana, and tightens borrowing limits before the move. Limits never go above the 75% admin-set cap, stale data only ever lowers them, and odds never liquidate anyone.
+Lending markets set loan-to-value limits by governance vote and rarely change them, so limits are still the calm-week numbers when volatility arrives. Brace reads Gemini's live "price X or above" ladders, computes implied volatility onchain on Solana, and lowers borrowing limits as soon as traders price a bigger move. Limits never go above the 75% admin-set cap, stale data only ever lowers them, and odds never liquidate anyone.
 
 | What | Steps, time and what it needs |
 |---|---|
@@ -25,7 +25,7 @@ You use the real app on Solana devnet, where every token is free test money. Ste
 
 1. **Open [braced.vercel.app](https://braced.vercel.app).** You see **Lending limits that move before the market does**, SOL's live borrow limit, and Gemini's ladder drawn as **chance it ends above** each strike. Scroll to **Five limits, traced for 24 hours** for SOL, BTC, ETH, XRP and ZEC.
 2. **Tap Try a borrow.** The borrow page shows the same **SOL live limit**, a **Connect wallet** button and a **Before you start** list.
-3. **Open [History](https://braced.vercel.app/history).** You see 24 hours of SOL's limit and implied volatility, and **Blocked and allowed borrows**: each **Blocked by the program** row is a borrow Solana rejected, recorded by QuickNode Streams. If History says it could not load, the relayer's free history store hit its daily read limit; it resets at 00:00 UTC (see Known Limitations). Limits and borrowing are unaffected.
+3. **Open [History](https://braced.vercel.app/history).** You see 24 hours of SOL's limit and implied volatility, and **Blocked and allowed borrows**: each **Blocked by the program** row is a borrow Solana rejected, recorded by QuickNode Streams. If the relayer's free history store has hit its daily read limit, the page says **Live history is paused for today** and charts the last 24 hours recorded before the pause; it resets at 00:00 UTC (see [Known Limitations](#known-limitations)). Limits and borrowing are unaffected.
 
 You just saw a borrow limit computed onchain from Gemini's odds, and the borrows it has already stopped.
 
@@ -53,7 +53,17 @@ Measured with Playwright Chromium at a 390 px phone viewport, cold cache, from o
 - **The math works on real Gemini data.** A captured SOL ladder used as a test fixture fits onchain to 82.7% implied volatility and a 69.6% limit (`sigma_bps` 8272, `max_ltv_bps` 6960), matching an independent float reference ([`programs/brace/tests/oracle.rs`](programs/brace/tests/oracle.rs), [`src/math.rs`](programs/brace/src/math.rs) unit tests).
 - **The deployed program is this repo's code.** The program dumped from devnet (`solana program dump -u devnet Frv6CVJKADmkM2cnBSMKgBWPvtHsfYkfye5d4vB84WyC deployed.so`) has the same SHA-256 as a fresh `cargo build-sbf` of `programs/brace` on main: `5ab936eca3384bd94cff3f3c6605e17832f6667a82571b60f50730091fcf2e81`, checked twice on Nov 19, 2026 (program source last changed in `3ee7c0e`).
 - **Reviewed in six passes** by four separate AI reviewer sessions (not a professional audit): no critical or high findings; fixed mediums each have a reproducing test, and the open ones are listed in Known Limitations ([`docs/reviews.md`](docs/reviews.md)).
-- **Accuracy (Alchin's tracker, [`tracker/`](tracker/)):** across 8,303 one hour forecasts posted between Nov 17 04:59 and Nov 19 03:22 Lagos, the price stayed inside Brace's 1σ band 79.47% of the time and inside 2σ 97.21% (a perfectly calibrated band would hold about 68% and 95%). Counting only non overlapping hourly forecasts: 1σ 135/164 (82.32%), 2σ 160/164 (97.56%). So the limits run conservative, which is the safe side for a lender. Per asset 1σ: SOL 81.45%, BTC 71.38%, ETH 79.43%, XRP 84.91%, ZEC 81.16%. 24 hour results are preliminary because of feed gaps; BTC was under the target at 24h on this sample. These check the 1 hour 1σ and 2σ bands; the limit itself uses a 3σ 24 hour move, which needs a longer record to test. A reproducible snapshot is committed in [`docs/accuracy/2026-11-19/`](docs/accuracy/2026-11-19/): the same tracker on rows through Nov 19 06:56 Lagos gives 1σ 77.65% and 2σ 96.33% across 9,017 one hour forecasts. With a day more data, a Nov 20 snapshot in [`docs/accuracy/2026-11-20/`](docs/accuracy/2026-11-20/) gives 1σ 78.15% and 2σ 96.55% across 15,656 forecasts, and Alchin's own run that morning gave 79.0% and 96.7% across 14,393.
+- **Accuracy (Alchin's tracker, [`tracker/`](tracker/)):** the price landed inside Brace's 1σ band about 78 to 79% of the time across every run, and inside 2σ about 96 to 97%. A perfectly calibrated band holds about 68% and 95%, so the limits run conservative, the safe side for a lender. Each forecast is a one hour band posted every minute, so consecutive forecasts overlap.
+
+  | Run | Forecasts | 1σ | 2σ | Check it |
+  |---|---|---|---|---|
+  | Alchin, pull at 04:22 Lagos, Nov 19 (rows from Nov 17 04:59) | 8,303 | 79.47% | 97.21% | His tracker run; same rows feed the snapshots below |
+  | Same, only non-overlapping hours | 164 | 82.32% | 97.56% | |
+  | Snapshot to Nov 19 06:56 Lagos | 9,017 | 77.65% | 96.33% | [`docs/accuracy/2026-11-19/`](docs/accuracy/2026-11-19/), reproduce command inside |
+  | Alchin, run at 01:17 Lagos, Nov 20 | 14,393 | 79.0% | 96.7% | His tracker run |
+  | Snapshot to Nov 20 05:35 Lagos | 15,656 | 78.15% | 96.55% | [`docs/accuracy/2026-11-20/`](docs/accuracy/2026-11-20/), reproduce command inside |
+
+  Per asset at 1σ on the Nov 20 snapshot: SOL 76.9%, BTC 70.4%, ETH 78.8%, XRP 83.4%, ZEC 81.8%. These test the 1 hour 1σ and 2σ bands; the limit itself uses a 3σ 24 hour move, which needs a longer record (24 hour results so far are preliminary because of feed gaps).
 
 ## What's New Here
 
@@ -106,9 +116,9 @@ Sources were fetched on Nov 17, 2026. Each competitor cell is as that vendor's c
 | Brace program (oracle, limits, pool, liquidation) | Live on Solana devnet at the address above. 52/52 Rust tests passed on Nov 19, 2026. |
 | Relayer Worker (Cloudflare, every minute) | Live at [brace-relayer.ohjaye0.workers.dev](https://brace-relayer.ohjaye0.workers.dev/health). 117/117 worker tests passed on main on Nov 19, 2026. The live Worker runs an earlier build: the forged-history fix (audit pass 6, M3) and the backup RPC (PR #4) are on main and deploy next. |
 | Keyed backup RPC for the relayer (PR #4) | In code on main and covered by the worker tests; not yet deployed to the live Worker. |
-| Streams sink and `/history` API | Live. `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
+| Streams sink and `/history` API | Live, except when the free D1 read limit runs out (see [Known Limitations](#known-limitations)). `/history?asset=SOL` is oldest-first. `/actions` has recorded the verified deposit, blocked borrow and accepted borrow. Bad input gets a 400 with a plain error; responses are capped at 10,000 rows (page forward with `since`). |
 | Web app (risk board, borrow flow, history) | Live at [braced.vercel.app](https://braced.vercel.app). 108/108 app tests passed on main on Nov 19, 2026. The board and History read the relayer through the app's cached `/api/history` and `/api/actions` routes. |
-| Accuracy tracker (Python, [`tracker/`](tracker/)) | Measured by Alchin from a live `/history` pull at 04:22 Lagos, Nov 19: 1σ band held 79.47% and 2σ 97.21% across 8,303 one hour forecasts (see Proof It's Real). |
+| Accuracy tracker (Python, [`tracker/`](tracker/)) | Running. Polls `/history` every 5 minutes, fetching only new rows after the first pull. Latest: 1σ 78.15% and 2σ 96.55% across 15,656 one hour forecasts (Nov 20 snapshot; see [Proof It's Real](#proof-its-real)). 10/10 tracker tests pass (`python3 tracker/test_tracker.py`). |
 
 ## More Ways to Test
 
@@ -124,13 +134,13 @@ Checks the app returns 200, the relayer is healthy and all five feeds posted in 
 
 </details>
 
-<details><summary><strong>2. One command for everything (not timed end to end; Rust 1.89, Solana CLI with cargo build-sbf, Node 20+)</strong></summary>
+<details><summary><strong>2. One command for everything (about 15 minutes from cold; Rust 1.89, Solana CLI with cargo build-sbf, Node 20+)</strong></summary>
 
 ```bash
 scripts/verify.sh
 ```
 
-Builds the program, runs the Rust, worker and app suites with type checks, builds the app, then runs the live checks. It stops at the first failure. The fuzz run alone took 48 to 80 s on Nov 19, 2026, depending on the machine; the whole script takes about 15 minutes from cold.
+Builds the program, runs the Rust, worker and app suites with type checks, builds the app, then runs the live checks. It stops at the first failure. The fuzz run alone took 48 to 80 s on Nov 19, 2026, depending on the machine. If the history store is paused, the last line says so instead of `all checks passed`.
 
 </details>
 
@@ -150,7 +160,7 @@ Expected: 52 Rust tests (15 math, 12 adversarial, 1 fuzz run of 3,000 random act
 
 ## Screenshots
 
-Real captures of the live site on a 390 px phone viewport, Nov 19, 2026. Devnet data, test money.
+Real captures of the live site on a 390 px phone viewport, Nov 20, 2026, 06:00 Lagos. Devnet data, test money.
 
 <p align="center">
   <img src="docs/images/borrow.jpg" width="160" alt="The borrow page: Borrow up to the line, SOL live limit 70.8% at spot $74.46, and a Connect wallet button.">
@@ -196,7 +206,7 @@ Each Gemini contract "price ≥ K at expiry" trades at a probability. Under a lo
 1. Keep quotes with both sides, spread ≤ 15 cents, mid between 3% and 97%; skip strikes more than 15% from the middle strike.
 2. Least-squares fit gives σ√T and the implied median. The strikes must span at least 0.5%, and σ must be at least 5%.
 3. Move over 24 hours: s = σ√T·√(24h/T). Limit = 80% × (1 − 3s), clamped between 30% and the 75% admin-set cap.
-4. Stale data: hold the last limit for 5 minutes, then step down 2.5 points every 5 minutes, never below 50% (or the last limit if lower). After an hour, borrowing and liquidation pause.
+4. Stale data: hold the last limit for 5 minutes, then step down 2.5 points every 5 minutes, never below 50% (or the last limit if lower). After an hour without a confident post, borrowing and liquidation pause.
 
 </details>
 
@@ -214,20 +224,19 @@ Reviewed in six passes (correctness, access control, financial logic, adversaria
 
 ### Known Limitations
 
-- **The relayer is trusted** for quotes and the spot price. Mitigations: spot only moves on confident posts, must sit within 3% of the ladder's implied median, and goes stale after an hour.
-- **`initialize` can be front-run** between deploy and setup. Deploy, initialize and pool setup run back to back from one script, and the stored admin is checked afterwards.
-- **Liquidation repays the full debt** only. Test USD has no value.
+**Trust and control**
+- **The relayer is a single trusted key** for quotes and the spot price; nothing onchain proves the quotes came from Gemini, and there is no quorum or second source. Mitigations: spot only moves on confident posts and must sit within 3% of the ladder's implied median, and every limit stays between 30% and 75%. Thin ladders (3 two-sided quotes, spreads up to 15 cents) can still pull the fitted volatility down, inside that band.
 - **One admin key, no timelock.** The admin (`FncbMM…SvdM` on devnet) can change the 75% cap, the 80% liquidation threshold and the other parameters at any time with `set_params`. Odds never trigger a liquidation, but a lower threshold set by the admin would. Production needs a multisig and a timelock.
-- **Collateral can be priced with an old spot for up to an hour.** Spot only updates on confident posts. In a crash where Gemini's ladder lags spot by more than 3%, liquidation runs on the pre-crash price; after a dip, a healthy position can be liquidated on the old dip price. Both last at most an hour, until `StalePrice`. The fix is a separate, shorter freshness clock for spot (audit pass 6, M1 and M2).
+- **`initialize` can be front-run** between deploy and setup. Deploy, initialize and pool setup run back to back from one script, and the stored admin is checked afterwards.
+
+**Prices and liquidation**
+- **Collateral can be priced with a spot up to an hour old.** Spot only updates on confident posts. Borrows meanwhile face a limit that decays toward the 50% stale floor. In a crash where Gemini's ladder lags spot by more than 3%, liquidation runs on the pre-crash price; after a dip, a healthy position can be liquidated on the old dip price. An hour after the last confident post, `liquidate` fails with `StalePrice`, so positions can build bad debt. That is the cost of failing safe; the fix is a separate, shorter freshness clock for spot (audit pass 6, M1 and M2).
+- **Liquidation repays the full debt only, and there is no write-off.** The liquidator gets SOL worth the debt plus 5%, capped at the collateral, so above about 95% LTV the bonus shrinks and above 100% liquidating loses money.
 - **Rounding can loosen a limit slightly.** Midpoints snap to 50 bps steps before the fit, so on steep or narrow ladders the limit can be up to about 1.5 points looser than a floating point fit, still capped at 75%.
-- **Liquidation pauses on a stale price.** In a fast crash the fits can go non-confident, so spot stops updating; an hour after the last confident post, `liquidate` fails with `StalePrice` and positions can build bad debt. That is the cost of failing safe.
-- **No write-off for deeply underwater positions.** Liquidation pays the debt plus a 5% bonus in SOL, capped at the collateral, so above about 95% LTV the bonus shrinks and above 100% liquidating loses money. There is no instruction to write such a position off.
-- **Borrows can price collateral with spot up to an hour old.** The limit decays toward the 50% stale floor meanwhile (2.5 points every 5 minutes), but the price itself is not refreshed.
-- **Thin ladders can be leaned on.** A post counts with only 3 two-sided quotes and spreads up to 15 cents, so a few quotes could pull the fitted volatility down; the limit that results is still capped at 75%.
-- **The relayer is a single trusted key.** One keypair posts every feed; there is no quorum or second source.
-- **History can pause; limits cannot.** The relayer stores Streams rows in Cloudflare D1 on the free plan, which has a daily read limit. When it runs out, the relayer's `/history` and `/actions` answer 503 until 00:00 UTC, and the History page says so. Onchain posting, the board's live limits and borrowing are unaffected. The app now reads history through a cached proxy (5 minute buckets, served stale on error) so viewers share one read.
-- **Interest is 0%.** This is a risk-limit demo, not a full lending market.
-- **Devnet only.** Gemini liquidity is thin: quotes exist, trades are rare, which is why confidence scoring and fail-safe staleness exist.
+
+**Demo scope**
+- **Devnet only, 0% interest, test USD with no value.** This is a risk-limit demo, not a full lending market. Gemini liquidity is thin: quotes exist, trades are rare, which is why confidence scoring and fail-safe staleness exist.
+- **History can pause; limits cannot.** The relayer stores Streams rows in Cloudflare D1 on the free plan, which has a daily read limit. When it runs out, the relayer's `/history` and `/actions` answer 503 until 00:00 UTC. The History page then says **Live history is paused for today** and charts a saved copy of the last 24 hours recorded before the pause. Onchain posting, the board's live limits and borrowing are unaffected.
 - **Phantom simulation of an over-limit borrow.** Phantom simulates before it signs, and the program refuses an over-limit borrow, so Phantom shows "Failed to simulate the results of this request". The user has to confirm past that warning for the rejected transaction to land onchain; the borrow page explains each tap first. Phantom also shows a new-domain notice for any site it has not reviewed yet.
 
 <details><summary><strong>Repository</strong></summary>
@@ -265,7 +274,8 @@ Reviewed in six passes (correctness, access control, financial logic, adversaria
 | Mon Nov 16 | Spec and plan, Anchor workspace, onchain implied volatility math, oracle feed and quote posting, demo lending pool, fuzz and invariant suite, first review fixes |
 | Tue Nov 17 | Review pass 5 fixes, Cloudflare relayer Worker, Streams sink and history API, devnet deploy, risk board, borrow flow, history page, verify script, MIT licence |
 | Wed Nov 18 | Repo hygiene, Alchin's forecast validation tracker, site redesign, relayer D1 outage fix, Phantom borrow proof, new logo and share card |
-| Thu Nov 19 | Fresh test counts, privacy page, web analytics, rate limits, tablet header fix, README claims audit, keyed backup RPC (PR #4), this README |
+| Thu Nov 19 | Fresh test counts, privacy page, web analytics, rate limits, tablet header fix, keyed backup RPC (PR #4), ship check, cached history proxy, audit pass 6 (independent security audit, two cold judge runs, claims audit) and its fixes, security headers, tracker polling fix |
+| Fri Nov 20 | Nov 20 accuracy snapshot, refreshed History fallback, team names, retaken screenshots, this README pass |
 
 Check: `git log --reverse --format='%h %ad %s' --date=iso`.
 
