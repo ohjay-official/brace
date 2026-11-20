@@ -36,7 +36,7 @@ export const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Who built it?",
-    a: "Brace was built during UBC 2026 by Oh-Jay, Alchin Daryabarijavad and Omar Dosuyev. Oh-Jay led development, Alchin (co-builder and presenter) built the forecast validation and analytics tracker, and Omar led the presentation. The code is open source under the MIT licence.",
+    a: "Brace was built during UBC 2026 by Faithful Adejoh (Oh-Jay), Alchin Daryabarijavad and Omar Dosuyev. Faithful led development, Alchin (co-builder and presenter) built the forecast validation and analytics tracker, and Omar led the presentation. The code is open source under the MIT licence.",
   },
 ];
 

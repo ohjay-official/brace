@@ -61,7 +61,7 @@ TBD, and we will not pretend otherwise. The obvious path is charging lending pro
 No. It is a risk limit with a minimal pool to prove enforcement: SOL collateral, a test USD token with no value, 0% interest, full-debt liquidation only. The limit is the product.
 
 **Did you build this during the hackathon? How much was AI?**
-Yes. The first commit is Nov 15, 23:14 Lagos time, after the Nov 12 kickoff. Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions. Every change had to pass its tests: 52 Rust tests including a 3,000-action fuzz run, 117 Worker tests, 108 app tests, and six review passes by four separate AI reviewer sessions (not a professional audit).
+Yes. The first commit is Nov 15, 23:14 Lagos time, after the Nov 12 kickoff. Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Faithful Adejoh (Oh-Jay), who made the product decisions. Every change had to pass its tests: 52 Rust tests including a 3,000-action fuzz run, 117 Worker tests, 108 app tests, and six review passes by four separate AI reviewer sessions (not a professional audit).
 
 **Why does ZEC get a lower limit?**
 Because Gemini traders price bigger moves for it. Across Nov 17 its implied volatility ranged from 71% to 262% a year, against 27% to 66% for Bitcoin, so its limit moved between about 47% and 71% while Bitcoin stayed between about 72% and the 75% cap.

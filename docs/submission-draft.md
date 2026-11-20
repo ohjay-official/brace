@@ -121,7 +121,7 @@ Gemini's ladders are thin: quotes exist but trades are rare. That is why every p
 A check_borrow instruction other Solana lending programs can call by CPI, so any market can use the limit. Signed or multi-source quotes so the relayer is no longer trusted. A longer, non-overlapping track record from Alchin's tracker. Then more assets as Gemini lists them, and a mainnet pilot with a real lending market.
 
 ## Built with AI
-Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions and handled every wallet and account step. Each task was gated on its tests before it was committed.
+Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Faithful Adejoh (Oh-Jay), who made the product decisions and handled every wallet and account step. Each task was gated on its tests before it was committed.
 ````
 
 The accuracy line is in the Proof list above.

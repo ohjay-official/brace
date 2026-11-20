@@ -258,11 +258,11 @@ Reviewed in six passes (correctness, access control, financial logic, adversaria
 **A new project, written entirely inside the hackathon window (hacking opened Thu Nov 12, 6:00 PM CST).**
 
 - First commit: `a71e7ef`, 2026-11-15 23:14 Lagos (16:14 CST). No earlier code, template or boilerplate beyond `anchor init`. Check: `git log --reverse --format='%h %ad %s' --date=iso | head -3`.
-- Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Oh-Jay, who made the product decisions and handles every wallet and account step. Each task was gated on its tests before it was committed; there is no CI.
+- Code, tests and docs were written with AI coding assistants (Claude and Grok), directed by Faithful Adejoh (Oh-Jay), who made the product decisions and handles every wallet and account step. Each task was gated on its tests before it was committed; there is no CI.
 - Runtime: Anchor 1.2.2 (`anchor-lang`, `anchor-spl` with SPL Token), `@solana/web3.js` 1.99.0, Next.js 15.5.29, React 19.3.1, `@vercel/analytics` 2.0.1.
 - Development: LiteSVM 0.15.0, Vitest 5.1.0 (app and worker), TypeScript 5.9.3, Wrangler 4.163.0.
 - Services: Gemini Prediction Markets public API, Solana devnet, Cloudflare Workers, QuickNode Streams, Vercel.
-- Team: Oh-Jay led development; Alchin Daryabarijavad (co-builder and presenter) built the forecast validation and analytics tracker; Omar Dosuyev led the presentation.
+- Team: Faithful Adejoh (Oh-Jay) led development; Alchin Daryabarijavad (co-builder and presenter) built the forecast validation and analytics tracker; Omar Dosuyev led the presentation.
 - Event rules answered ([`docs/event.md`](docs/event.md)): FAQ 04 asks for a public repo, a working deployed app, a 2 to 3 minute video and a README with technical docs; FAQ 07 allows AI tools, and the AI use above is disclosed anyway.
 - The live site and relayer stay up through judging and after.
 
